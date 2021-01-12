@@ -1,23 +1,25 @@
-import { prop, ReturnModelType } from "@typegoose/typegoose";
+import { modelOptions, Prop, ReturnModelType } from "@typegoose/typegoose";
 import { IUser } from "../../../../schemas/auth/helper-schemas";
+import { getTypegooseOptions } from "../../utils/db-config";
 
+@modelOptions(getTypegooseOptions("users123"))
 export class User implements IUser {
-	@prop()
+	@Prop()
 	eMail: IUser["eMail"];
 
-	@prop()
+	@Prop({ unique: true })
 	firstName: IUser["firstName"];
 
-	@prop()
+	@Prop()
 	lastName: IUser["lastName"];
 
-	@prop()
+	@Prop()
 	phoneNumber: IUser["phoneNumber"];
 
-	@prop()
+	@Prop()
 	createdAt: Date;
 
-	@prop()
+	@Prop()
 	updatedAt: Date;
 }
 
