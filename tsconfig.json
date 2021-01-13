@@ -6,10 +6,18 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "lib": [
+      "es6"
+    ],
+    "sourceMap": false /* Generates corresponding '.map' file. */,
     "target": "es2017",
-    "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true
-  }
+  },
+  "compileOnSave": true,
+  "include": ["src","schemas"],
+  "exclude": ["node_modules","dist"]
 }

@@ -1,6 +1,11 @@
-import { ArgumentsHost, Catch, ExceptionFilter, NotFoundException } from '@nestjs/common';
-import { Request } from 'express';
-import { MError } from '../core/utils/errors';
+import {
+	ArgumentsHost,
+	Catch,
+	ExceptionFilter,
+	NotFoundException,
+} from "@nestjs/common";
+import { Request } from "express";
+import { MError } from "../core/utils/errors";
 
 @Catch()
 export class ErrorFilter implements ExceptionFilter {
@@ -19,6 +24,7 @@ export class ErrorFilter implements ExceptionFilter {
 			e instanceof MError &&
 			e.errorCode !== 404 &&
 			e.errorCode !== 401 &&
+			e.errorCode !== 417 &&
 			e.errorCode !== 403
 		) {
 			outputError = true;

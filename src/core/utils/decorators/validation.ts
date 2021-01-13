@@ -1,7 +1,7 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import * as originalJoi from 'joi';
-import { AnySchema, ValidationOptions } from 'joi';
-import { MError } from '../../core/utils/errors';
+import { createParamDecorator, ExecutionContext } from "@nestjs/common";
+import * as originalJoi from "joi";
+import { AnySchema, ValidationOptions } from "joi";
+import { MError } from "../errors";
 
 const defaultReqPart: ReqPart[] = ["params", "query", "body"];
 

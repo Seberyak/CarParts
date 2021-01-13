@@ -1,7 +1,7 @@
-import { Controller, Get, Post } from "@nestjs/common";
-import { wValidatedArg } from "../decorators/validation";
+import { Controller, Delete, Get, Post } from "@nestjs/common";
+import { wValidatedArg } from "../../core/utils/decorators/validation";
 import { IUser, UserSchema } from "../../../schemas/auth/helper-schemas";
-import { User, UserModel } from "../../core/models/typegoose/user";
+import { User, UserModel } from "../../core/models/typegoose/users";
 import { InjectModel } from "nestjs-typegoose";
 
 @Controller("api/auth")
@@ -11,7 +11,7 @@ export class AuthController {
 		private readonly _UserModel: UserModel
 	) {}
 
-	@Post("register")
+	@Post("/register")
 	async register(@wValidatedArg(UserSchema) args: IUser): Promise<IUser> {
 		console.log(args);
 
@@ -21,5 +21,10 @@ export class AuthController {
 	@Get("/")
 	async getAll(): Promise<IUser[]> {
 		return this._UserModel.find();
+	}
+
+	@Delete()
+	async deleteAll(): Promise<any> {
+		return this._UserModel.deleteMany({});
 	}
 }
