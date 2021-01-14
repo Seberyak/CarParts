@@ -23,7 +23,8 @@ export class AuthService {
 	) {}
 
 	public async create(args: IAPOSTUser): Promise<IRPOSTUser> {
-		return new this._UserModel(args);
+		const user = new this._UserModel(args);
+		return user.save();
 	}
 
 	public async get(args: IAGETUser): Promise<IRGETUser> {

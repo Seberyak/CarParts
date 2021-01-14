@@ -1,10 +1,20 @@
-import { modelOptions, Prop, ReturnModelType } from "@typegoose/typegoose";
+import {
+	getModelForClass,
+	modelOptions,
+	Prop,
+	ReturnModelType,
+} from "@typegoose/typegoose";
 import { IUser } from "../../../../schemas/auth/helper-schemas";
 import { getTypegooseOptions } from "../../utils/db-config";
-import { toInsertKeys } from "../../../../schemas/helper-schemas";
+import {
+	IArgsManyId,
+	IResponseDocsByManyId,
+	toInsertKeys,
+} from "../../../../schemas/helper-schemas";
+import { AbstractModel, getManyDocsFunc } from "./abstract";
 
 @modelOptions(getTypegooseOptions("users"))
-export class User implements Omit<IUser, toInsertKeys> {
+export class User implements Omit<IUser, toInsertKeys>, AbstractModel {
 	@Prop()
 	mail: IUser["mail"];
 
@@ -25,6 +35,13 @@ export class User implements Omit<IUser, toInsertKeys> {
 
 	@Prop()
 	password: IUser["password"];
-}
 
+	static getManyDocs(
+		args: IArgsManyId
+	): Promise<IResponseDocsByManyId<IUser>> {
+		return getManyDocsFunc(args, UserModel);
+	}
+}
 export type IUserModel = ReturnModelType<typeof User>;
+
+const UserModel = getModelForClass(User);

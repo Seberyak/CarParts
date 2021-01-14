@@ -28,6 +28,7 @@ import {
 	IRPOSTFile,
 } from "../../../schemas/file/validators";
 import { wValidatedArg } from "../../core/utils/decorators/validation";
+import { ObjectIdPattern } from "../../core/utils/common";
 
 // @ApiUseTags("Attachments")
 @Controller("api/files/")
@@ -42,7 +43,7 @@ export class FilesController {
 		description: "Attachment Files",
 	})
 	@UseInterceptors(FilesInterceptor("file"))
-	async upload(@UploadedFiles() files): Promise<IRPOSTFile> {
+	async upload(@UploadedFiles() files: any): Promise<IRPOSTFile> {
 		const response = [];
 		files.forEach(file => {
 			const fileResponse = {
@@ -64,7 +65,7 @@ export class FilesController {
 		return response;
 	}
 
-	@Get("info/:_id")
+	@Get(`info/:_id(${ObjectIdPattern})`)
 	async getFileInfo(
 		@wValidatedArg(AGETFileInfoSchema) args: IAGETFileInfo
 	): Promise<IFileInfo> {
@@ -83,28 +84,25 @@ export class FilesController {
 		};
 	}
 
-	@Get("/:_id")
+	@Get(`/:_id(${ObjectIdPattern})`)
 	async getFile(
 		@wValidatedArg(AGETRawFileSchema) args: IAGETRawFile,
-		@Res() res
+		@Res() res: any
 	): Promise<IRGETRawFile> {
 		const id = args._id.toHexString();
 		const file = await this.filesService.findInfo(id);
 		const filestream = await this.filesService.readStream(id);
 		if (!filestream) {
-			throw new MError(
-				HttpStatus.EXPECTATION_FAILED,
-				"An error occurred while retrieving file"
-			);
+			throw new MError(417, "An error occurred while retrieving file");
 		}
 		res.header("Content-Type", file.contentType);
 		return filestream.pipe(res);
 	}
 
-	@Get("download/:_id")
+	@Get(`download/:_id(${ObjectIdPattern})`)
 	async downloadFile(
 		@wValidatedArg(AGETDownloadFileSchema) args: IAGETDownloadFile,
-		@Res() res
+		@Res() res: any
 	): Promise<IRGETDownloadFile> {
 		const id = args._id.toHexString();
 		const file = await this.filesService.findInfo(id);

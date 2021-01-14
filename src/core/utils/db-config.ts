@@ -1,5 +1,6 @@
-import { IModelOptions } from "@typegoose/typegoose/lib/types";
+import { DocumentType, IModelOptions } from "@typegoose/typegoose/lib/types";
 import { Severity } from "@typegoose/typegoose";
+import { IBasicDocument } from "../../../schemas/helper-schemas";
 
 export const getTypegooseOptions = (collectionName: string): IModelOptions => {
 	return {
@@ -13,3 +14,12 @@ export const getTypegooseOptions = (collectionName: string): IModelOptions => {
 		},
 	};
 };
+
+export function docToObj<T extends DocumentType<any>>(
+	doc: T
+): T extends DocumentType<infer R> ? R & IBasicDocument : any {
+	if ((doc as any).constructor.name === "model") {
+		return (doc as any).toObject();
+	}
+	return doc as any;
+}

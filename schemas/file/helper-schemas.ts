@@ -1,4 +1,3 @@
-import { BasicDocumentSchema } from "../helper-schemas";
 import Joi from "../../src/@input/joi";
 
 export const FileSchema = Joi.object({

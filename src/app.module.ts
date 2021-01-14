@@ -13,6 +13,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { Part } from "./core/models/typegoose/parts";
 import { PartsService } from "./core/services/parts";
 import { AuthService } from "./core/services/auth";
+import { PartsController } from "./api/parts/contorller";
 
 @Module({
 	imports: [
@@ -26,7 +27,12 @@ import { AuthService } from "./core/services/auth";
 		}),
 		MongooseModule.forRoot("mongodb://localhost:27017/nest"),
 	],
-	controllers: [AppController, AuthController, FilesController],
+	controllers: [
+		AppController,
+		AuthController,
+		FilesController,
+		PartsController,
+	],
 	providers: [
 		AppService,
 		AuthService,

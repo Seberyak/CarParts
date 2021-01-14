@@ -18,6 +18,7 @@ import {
 	IRPUTUser,
 } from "../../../schemas/auth/validators";
 import { AuthService } from "../../core/services/auth";
+import { ObjectIdPattern } from "../../core/utils/common";
 
 @Controller("api/auth")
 export class AuthController {
@@ -30,7 +31,7 @@ export class AuthController {
 		return this._AuthService.create(args);
 	}
 
-	@Get("/:_id")
+	@Get(`/:_id(${ObjectIdPattern})`)
 	async get(
 		@wValidatedArg(AGETUserSchema) args: IAGETUser
 	): Promise<IRGETUser> {
@@ -44,14 +45,14 @@ export class AuthController {
 		return this._AuthService.getMany(args);
 	}
 
-	@Put("/:_id")
+	@Put(`/:_id(${ObjectIdPattern})`)
 	async update(
 		@wValidatedArg(APUTUserSchema) args: IAPUTUser
 	): Promise<IRPUTUser> {
 		return this._AuthService.update(args);
 	}
 
-	@Delete("/:_id")
+	@Delete(`/:_id(${ObjectIdPattern})`)
 	async deleteAll(
 		@wValidatedArg(ADELETEUserSchema) args: IADELETEUser
 	): Promise<IRDELETEUser> {
