@@ -1,9 +1,10 @@
 import { modelOptions, Prop, ReturnModelType } from "@typegoose/typegoose";
 import { IUser } from "../../../../schemas/auth/helper-schemas";
 import { getTypegooseOptions } from "../../utils/db-config";
+import { toInsertKeys } from "../../../../schemas/helper-schemas";
 
 @modelOptions(getTypegooseOptions("users"))
-export class User implements IUser {
+export class User implements Omit<IUser, toInsertKeys> {
 	@Prop()
 	mail: IUser["mail"];
 
@@ -26,4 +27,4 @@ export class User implements IUser {
 	password: IUser["password"];
 }
 
-export type UserModel = ReturnModelType<typeof User>;
+export type IUserModel = ReturnModelType<typeof User>;

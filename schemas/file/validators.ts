@@ -1,6 +1,6 @@
 import Joi from "../../src/@input/joi";
-import { ObjectId } from "bson";
 import { FileInfoSchema, IFileInfo } from "./helper-schemas";
+import { IArgsId } from "../helper-schemas";
 
 ///---------------POST file
 
@@ -18,9 +18,7 @@ export const AGETFileInfoSchema = Joi.object({
 	_id: Joi.objectId().required(),
 });
 
-export interface IAGETFileInfo {
-	_id: ObjectId;
-}
+export type IAGETFileInfo = IArgsId;
 
 export const RGETFileInfoSchema = FileInfoSchema;
 
@@ -32,9 +30,7 @@ export const AGETRawFileSchema = Joi.object({
 	_id: Joi.objectId().required(),
 });
 
-export interface IAGETRawFile {
-	_id: ObjectId;
-}
+export type IAGETRawFile = IArgsId;
 
 export const RGETRawFileSchema = Joi.any();
 
@@ -46,9 +42,7 @@ export const AGETDownloadFileSchema = Joi.object({
 	_id: Joi.objectId().required(),
 });
 
-export interface IAGETDownloadFile {
-	_id: ObjectId;
-}
+export type IAGETDownloadFile = IArgsId;
 
 export const RGETDownloadFileSchema = Joi.any();
 
@@ -60,9 +54,7 @@ export const ADELETEFileSchema = Joi.object({
 	_id: Joi.objectId().required(),
 });
 
-export interface IADELETEFile {
-	_id: ObjectId;
-}
+export type IADELETEFile = IArgsId;
 
 export const RGETDELETEFileSchema = FileInfoSchema;
 

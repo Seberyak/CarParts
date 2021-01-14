@@ -10,13 +10,16 @@ import { GridFsMulterConfigService } from "./core/services/files/gridfs-multer-c
 import { FilesController } from "./api/files/controller";
 import { FilesService } from "./core/services/files";
 import { MongooseModule } from "@nestjs/mongoose";
+import { Part } from "./core/models/typegoose/parts";
+import { PartsService } from "./core/services/parts";
+import { AuthService } from "./core/services/auth";
 
 @Module({
 	imports: [
 		TypegooseModule.forRoot("mongodb://localhost:27017/nest", {
 			useNewUrlParser: true,
 		}),
-		TypegooseModule.forFeature([User, File]),
+		TypegooseModule.forFeature([User, File, Part]),
 		// MulterModule.register({ dest: "./uploads" }),
 		MulterModule.registerAsync({
 			useClass: GridFsMulterConfigService,
@@ -24,6 +27,12 @@ import { MongooseModule } from "@nestjs/mongoose";
 		MongooseModule.forRoot("mongodb://localhost:27017/nest"),
 	],
 	controllers: [AppController, AuthController, FilesController],
-	providers: [AppService, GridFsMulterConfigService, FilesService],
+	providers: [
+		AppService,
+		AuthService,
+		GridFsMulterConfigService,
+		FilesService,
+		PartsService,
+	],
 })
 export class AppModule {}

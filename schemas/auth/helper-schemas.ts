@@ -1,6 +1,7 @@
 import Joi from "../../src/@input/joi";
+import { BasicDocumentSchema, IBasicDocument } from "../helper-schemas";
 
-export const UserSchema = Joi.object({
+export const UserSchema = BasicDocumentSchema.object({
 	firstName: Joi.string().required(),
 	lastName: Joi.string().required(),
 	phoneNumber: Joi.string().required(),
@@ -13,7 +14,7 @@ export const UserSchema = Joi.object({
 		.required(),
 });
 
-export interface IUser {
+export interface IUser extends IBasicDocument {
 	firstName: string;
 	lastName: string;
 	phoneNumber: string;
