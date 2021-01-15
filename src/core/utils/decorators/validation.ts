@@ -2,6 +2,7 @@ import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import * as originalJoi from "joi";
 import { AnySchema, ValidationOptions } from "joi";
 import { MError } from "../errors";
+import { JwtService } from "@nestjs/jwt";
 
 const defaultReqPart: ReqPart[] = ["params", "query", "body"];
 
@@ -17,6 +18,17 @@ export const wValidatedArg = createParamDecorator(
 		return validateSchema(object, schema);
 	}
 );
+
+export const wUser = createParamDecorator((data, ctx: ExecutionContext) => {
+	const req = ctx.switchToHttp().getRequest();
+	const access_token = req.headers.access_token;
+	const decoded = new JwtService({}).decode(access_token) as any;
+	const { iat, exp, ...user } = decoded;
+	if (!user) {
+		throw new MError(401, "Authentication Failed");
+	}
+	return user;
+});
 
 type ReqPart = "params" | "query" | "body";
 

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./api/app/app.controller";
 import { AppService } from "./core/services/app";
-import { AuthController } from "./api/auth/controller";
+import { UsersController } from "./api/users/controller";
 import { TypegooseModule } from "nestjs-typegoose";
 import { User } from "./core/models/typegoose/users";
 import { MulterModule } from "@nestjs/platform-express";
@@ -12,8 +12,15 @@ import { FilesService } from "./core/services/files";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Part } from "./core/models/typegoose/parts";
 import { PartsService } from "./core/services/parts";
-import { AuthService } from "./core/services/auth";
 import { PartsController } from "./api/parts/contorller";
+import { LocalStrategy } from "./core/services/users/local.strategy";
+import { AuthController } from "./api/auth/controller";
+import { UsersService } from "./core/services/users";
+import { JwtModule } from "@nestjs/jwt";
+import { jwtConstants } from "./core/services/auth/jwt.constants";
+import { JwtStrategy } from "./core/services/auth/jwt.strategy";
+import { JwtAuthGuard } from "./core/services/auth/jwt-auth.guard";
+import { AuthService } from "./core/services/auth";
 
 @Module({
 	imports: [
@@ -26,19 +33,28 @@ import { PartsController } from "./api/parts/contorller";
 			useClass: GridFsMulterConfigService,
 		}),
 		MongooseModule.forRoot("mongodb://localhost:27017/nest"),
+		JwtModule.register({
+			secret: jwtConstants.secret,
+			signOptions: { expiresIn: "2days" },
+		}),
 	],
 	controllers: [
 		AppController,
-		AuthController,
+		UsersController,
 		FilesController,
 		PartsController,
+		AuthController,
 	],
 	providers: [
 		AppService,
-		AuthService,
+		UsersService,
 		GridFsMulterConfigService,
 		FilesService,
 		PartsService,
+		LocalStrategy,
+		JwtStrategy,
+		JwtAuthGuard,
+		AuthService,
 	],
 })
 export class AppModule {}

@@ -1,10 +1,5 @@
 import { IPart } from "../../../../schemas/parts/helper-schemas";
-import {
-	getModelForClass,
-	modelOptions,
-	Prop,
-	ReturnModelType,
-} from "@typegoose/typegoose";
+import { modelOptions, Prop, ReturnModelType } from "@typegoose/typegoose";
 import { getTypegooseOptions } from "../../utils/db-config";
 import { AbstractModel, getManyDocsFunc } from "./abstract";
 import {
@@ -45,12 +40,11 @@ export class Part implements Omit<IPart, "_id">, AbstractModel {
 	updatedAt: IPart["updatedAt"];
 
 	static getManyDocs(
+		this: IPartModel,
 		args: IArgsManyId
 	): Promise<IResponseDocsByManyId<IPart>> {
-		return getManyDocsFunc(args, PartModel);
+		return getManyDocsFunc(args, this);
 	}
 }
 
 export type IPartModel = ReturnModelType<typeof Part>;
-
-const PartModel = getModelForClass(Part);
