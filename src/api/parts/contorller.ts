@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Post, Put } from "@nestjs/common";
 import { PartsService } from "../../core/services/parts";
-import { wValidatedArg } from "../../core/utils/decorators/validation";
+import { wUser, wValidatedArg } from "../../core/utils/decorators/validation";
 import {
 	ADELETEPartSchema,
 	AGETManyPartSchema,
@@ -19,16 +19,24 @@ import {
 	IRPUTPart,
 } from "../../../schemas/parts/validators";
 import { ObjectIdPattern } from "../../core/utils/common";
+import { IUser } from "../../../schemas/user/helper-schemas";
+import { InjectModel } from "nestjs-typegoose";
+import { IUserModel, User } from "../../core/models/typegoose/users";
 
 @Controller("api/parts/")
 export class PartsController {
-	constructor(private readonly _PartsService: PartsService) {}
+	constructor(
+		private readonly _PartsService: PartsService,
+		@InjectModel(User)
+		private readonly _UserModel: IUserModel
+	) {}
 
 	@Post("/")
 	async create(
-		@wValidatedArg(APOSTPartSchema) args: IAPOSTPart
+		@wValidatedArg(APOSTPartSchema) args: IAPOSTPart,
+		@wUser(this._UserModel) user: IUser
 	): Promise<IRPOSTPart> {
-		return this._PartsService.create(args);
+		return this._PartsService.create(args, user);
 	}
 
 	@Get(`/:_id(${ObjectIdPattern})`)
@@ -45,17 +53,19 @@ export class PartsController {
 		return this._PartsService.getMany(args);
 	}
 
-	@Put("/")
+	@Put(`/`)
 	async update(
-		@wValidatedArg(APUTPartSchema) args: IAPUTPart
+		@wValidatedArg(APUTPartSchema) args: IAPUTPart,
+		@wUser() user: IUser
 	): Promise<IRPUTPart> {
-		return this._PartsService.update(args);
+		return this._PartsService.update(args, user);
 	}
 
 	@Delete(`/:_id(${ObjectIdPattern})`)
 	async delete(
-		@wValidatedArg(ADELETEPartSchema) args: IADELETEPart
+		@wValidatedArg(ADELETEPartSchema) args: IADELETEPart,
+		@wUser() user: IUser
 	): Promise<IRDELETEPart> {
-		return this._PartsService.delete(args);
+		return this._PartsService.delete(args, user);
 	}
 }

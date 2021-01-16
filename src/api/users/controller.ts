@@ -1,5 +1,5 @@
-import { Controller, Delete, Get, Post, Put } from "@nestjs/common";
-import { wValidatedArg } from "../../core/utils/decorators/validation";
+import { Controller, Delete, Get, Post, Put, UseGuards } from "@nestjs/common";
+import { wUser, wValidatedArg } from "../../core/utils/decorators/validation";
 import {
 	ADELETEUserSchema,
 	AGETManyUserSchema,
@@ -19,6 +19,8 @@ import {
 } from "../../../schemas/user/validators";
 import { UsersService } from "../../core/services/users";
 import { ObjectIdPattern } from "../../core/utils/common";
+import { IsAdmin } from "../../core/utils/guards";
+import { IUser } from "../../../schemas/user/helper-schemas";
 
 @Controller("api/users")
 export class UsersController {
@@ -31,6 +33,7 @@ export class UsersController {
 		return this._UsersService.create(args);
 	}
 
+	@UseGuards(IsAdmin)
 	@Get(`/:_id(${ObjectIdPattern})`)
 	async get(
 		@wValidatedArg(AGETUserSchema) args: IAGETUser
@@ -38,6 +41,7 @@ export class UsersController {
 		return this._UsersService.get(args);
 	}
 
+	@UseGuards(IsAdmin)
 	@Get("/many")
 	async getMany(
 		@wValidatedArg(AGETManyUserSchema) args: IAGETManyUser
@@ -45,13 +49,15 @@ export class UsersController {
 		return this._UsersService.getMany(args);
 	}
 
-	@Put(`/:_id(${ObjectIdPattern})`)
+	@Put(`/`)
 	async update(
-		@wValidatedArg(APUTUserSchema) args: IAPUTUser
+		@wValidatedArg(APUTUserSchema) args: IAPUTUser,
+		@wUser() user: IUser
 	): Promise<IRPUTUser> {
-		return this._UsersService.update(args);
+		return this._UsersService.update(args, user);
 	}
 
+	@UseGuards(IsAdmin)
 	@Delete(`/:_id(${ObjectIdPattern})`)
 	async deleteAll(
 		@wValidatedArg(ADELETEUserSchema) args: IADELETEUser
