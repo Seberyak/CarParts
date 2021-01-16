@@ -10,7 +10,7 @@ import {
 @modelOptions(getTypegooseOptions("parts"))
 export class Part implements Omit<IPart, "_id">, AbstractModel {
 	@Prop()
-	applicantId: IPart["applicantId"];
+	author: IPart["author"];
 
 	@Prop()
 	category: IPart["category"];
@@ -37,7 +37,7 @@ export class Part implements Omit<IPart, "_id">, AbstractModel {
 	createdAt: Date;
 
 	@Prop()
-	updatedAt: IPart["updatedAt"];
+	updatedAt: Date;
 
 	static getManyDocs(
 		this: IPartModel,

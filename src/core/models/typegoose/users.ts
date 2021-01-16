@@ -10,10 +10,10 @@ import { AbstractModel, getManyDocsFunc } from "./abstract";
 
 @modelOptions(getTypegooseOptions("users"))
 export class User implements Omit<IUser, toInsertKeys>, AbstractModel {
-	@Prop()
+	@Prop({ unique: true })
 	mail: IUser["mail"];
 
-	@Prop({ unique: true })
+	@Prop()
 	firstName: IUser["firstName"];
 
 	@Prop()
@@ -30,6 +30,9 @@ export class User implements Omit<IUser, toInsertKeys>, AbstractModel {
 
 	@Prop()
 	password: IUser["password"];
+
+	@Prop()
+	type: IUser["type"];
 
 	static getManyDocs(
 		this: IUserModel,
