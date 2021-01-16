@@ -14,6 +14,15 @@ export interface IBasicDocument {
 }
 ///
 
+export const StripSchemaKeys = (
+	schema: Record<string, any>,
+	keys: string[]
+) => {
+	const stripSchema = {};
+	keys.forEach(key => (stripSchema[key] = Joi.any().strip()));
+	return schema.keys(stripSchema);
+};
+
 export const InsertStripKeysSchema = {
 	_id: Joi.any().strip(),
 	createdAt: Joi.any().strip(),
@@ -21,6 +30,13 @@ export const InsertStripKeysSchema = {
 };
 
 export type toInsertKeys = "_id" | "createdAt" | "updatedAt";
+
+export const UpdateStripKeysSchema = {
+	createdAt: Joi.any().strip(),
+	updatedAt: Joi.any().strip(),
+};
+
+export type toUpdateKeys = "createdAt" | "updatedAt";
 
 ///
 

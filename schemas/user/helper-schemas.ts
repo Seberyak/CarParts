@@ -1,5 +1,6 @@
 import Joi from "../../src/@input/joi";
 import { BasicDocumentSchema, IBasicDocument } from "../helper-schemas";
+import { ObjectId } from "bson";
 
 export const UserSchema = BasicDocumentSchema.keys({
 	firstName: Joi.string().required(),
@@ -12,6 +13,7 @@ export const UserSchema = BasicDocumentSchema.keys({
 		.min(8)
 		.max(16)
 		.required(),
+	type: Joi.objectId().required(),
 });
 
 export interface IUser extends IBasicDocument {
@@ -20,4 +22,5 @@ export interface IUser extends IBasicDocument {
 	phoneNumber: string;
 	mail: string;
 	password: string;
+	type: ObjectId;
 }

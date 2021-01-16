@@ -3,12 +3,12 @@ import { ObjectId } from "bson";
 import { BasicDocumentSchema, IBasicDocument } from "../helper-schemas";
 
 export const PartSchema = BasicDocumentSchema.keys({
-	applicantId: Joi.objectId().required(),
 	title: Joi.string().required(),
 	description: Joi.string().required(),
+	author: Joi.objectId().required(),
 	price: Joi.number().required(),
 	oem: Joi.string().required(),
-	manufacturer: Joi.string().required(),
+	manufacturer: Joi.string(),
 	category: Joi.string().required(),
 	images: Joi.array()
 		.items(Joi.objectId())
@@ -16,12 +16,12 @@ export const PartSchema = BasicDocumentSchema.keys({
 });
 
 export interface IPart extends IBasicDocument {
-	applicantId: ObjectId;
 	title: string;
 	description: string;
+	author: ObjectId;
 	price: number;
 	oem: string;
-	manufacturer: string;
+	manufacturer?: string;
 	category: string;
 	images: ObjectId[];
 }
