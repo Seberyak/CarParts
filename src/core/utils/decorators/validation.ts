@@ -3,6 +3,10 @@ import * as originalJoi from "joi";
 import { AnySchema, ValidationOptions } from "joi";
 import { MError } from "../errors";
 import { JwtService } from "@nestjs/jwt";
+import { UserSchema } from "../../../../schemas/user/helper-schemas";
+import Joi from "../../../@input/joi";
+
+///
 
 const defaultReqPart: ReqPart[] = ["params", "query", "body"];
 
@@ -19,15 +23,23 @@ export const wValidatedArg = createParamDecorator(
 	}
 );
 
+///
+
+export const DecodedUserSchema = UserSchema.keys({
+	password: Joi.any().strip(),
+});
+
+//TODO if user deleted from DB but token still exist at client side, it is valid to act
 export const wUser = createParamDecorator((data, ctx: ExecutionContext) => {
 	const req = ctx.switchToHttp().getRequest();
 	const access_token = req.headers.access_token;
-	const decoded = new JwtService({}).decode(access_token) as any;
-	const { iat, exp, ...user } = decoded;
-	if (!user) {
+	const decodedUser: Record<string, any> = new JwtService({}).decode(
+		access_token
+	) as any;
+	if (!decodedUser?._id) {
 		throw new MError(401, "Authentication Failed");
 	}
-	return user;
+	return validateSchema(decodedUser, DecodedUserSchema);
 });
 
 type ReqPart = "params" | "query" | "body";
@@ -63,7 +75,7 @@ function getObject(
 	return object;
 }
 
-function validateSchema<T>(
+export function validateSchema<T>(
 	obj: T,
 	schema: AnySchema,
 	options: ValidationOptions = {

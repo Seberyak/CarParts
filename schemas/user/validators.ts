@@ -7,6 +7,8 @@ import {
 	IResponseDocsByManyId,
 	ResponseDocsByManyIdSchema,
 	toInsertKeys,
+	UpdateStripKeysSchema,
+	toUpdateKeys,
 } from "../helper-schemas";
 import { IUser, UserSchema } from "./helper-schemas";
 import Joi from "../../src/@input/joi";
@@ -43,9 +45,9 @@ export type IRGETManyUser = IResponseDocsByManyId<IUser>;
 
 ///---------------PUT user
 
-export const APUTUserSchema = UserSchema;
+export const APUTUserSchema = UserSchema.keys(UpdateStripKeysSchema);
 
-export type IAPUTUser = IUser;
+export type IAPUTUser = Omit<IUser, toUpdateKeys>;
 
 export const RPUTUserSchema = UserSchema;
 

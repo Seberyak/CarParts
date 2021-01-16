@@ -13,9 +13,12 @@ import {
 
 ///---------------POST part
 
-export const APOSTPartSchema = PartSchema.keys(InsertStripKeysSchema);
+export const APOSTPartSchema = PartSchema.keys({
+	...InsertStripKeysSchema,
+	author: Joi.any().strip(),
+});
 
-export type IAPOSTPart = Omit<IPart, toInsertKeys>;
+export type IAPOSTPart = Omit<IPart, toInsertKeys | "author">;
 
 export const RPOSTPartSchema = PartSchema;
 
