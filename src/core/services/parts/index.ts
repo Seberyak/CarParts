@@ -13,7 +13,12 @@ import {
 	IRPOSTPart,
 	IRPUTPart,
 } from "../../../../schemas/parts/validators";
-import { assertResourceExist } from "../../utils/asserts";
+import {
+	assertResourceExist,
+	assertUserHasPermission,
+} from "../../utils/asserts";
+import { IUser } from "../../../../schemas/user/helper-schemas";
+import { docToObj } from "../../utils/db-config";
 
 @Injectable()
 export class PartsService {
@@ -22,8 +27,8 @@ export class PartsService {
 		private readonly _PartModel: IPartModel
 	) {}
 
-	public async create(args: IAPOSTPart): Promise<IRPOSTPart> {
-		const part = new this._PartModel(args);
+	public async create(args: IAPOSTPart, user: IUser): Promise<IRPOSTPart> {
+		const part = new this._PartModel({ ...args, author: user._id });
 		return part.save();
 	}
 
@@ -37,16 +42,28 @@ export class PartsService {
 		return this._PartModel.getManyDocs(args);
 	}
 
-	public async update(args: IAPUTPart): Promise<IRPUTPart> {
+	public async update(args: IAPUTPart, user: IUser): Promise<IRPUTPart> {
 		const { _id, ...updateData } = args;
-		const updatedPart = this._PartModel.findOneAndUpdate(_id, updateData, {
-			new: true,
-		});
-		assertResourceExist(updatedPart, "part");
-		return updatedPart;
+		const part = await this._PartModel
+			.findById(_id)
+			.then(doc => docToObj(doc));
+		assertResourceExist(part, "part");
+		assertUserHasPermission(user, part);
+
+		return this._PartModel
+			.updateOne(_id, updateData)
+			.then(doc => docToObj(doc));
 	}
 
-	public async delete(args: IADELETEPart): Promise<IRDELETEPart> {
+	public async delete(
+		args: IADELETEPart,
+		user: IUser
+	): Promise<IRDELETEPart> {
+		const part = await this._PartModel
+			.findById(args._id)
+			.then(doc => docToObj(doc));
+		assertResourceExist(part, "part");
+		assertUserHasPermission(user, part);
 		return this._PartModel.deleteOne(args);
 	}
 }

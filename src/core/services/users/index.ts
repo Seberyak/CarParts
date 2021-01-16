@@ -13,7 +13,12 @@ import {
 	IRPOSTUser,
 	IRPUTUser,
 } from "../../../../schemas/user/validators";
-import { assertResourceExist } from "../../utils/asserts";
+import {
+	assertResourceExist,
+	assertUserHasPermission,
+} from "../../utils/asserts";
+import { IUser } from "../../../../schemas/user/helper-schemas";
+import { docToObj } from "../../utils/db-config";
 
 @Injectable()
 export class UsersService {
@@ -34,23 +39,19 @@ export class UsersService {
 	}
 
 	public async getMany(args: IAGETManyUser): Promise<IRGETManyUser> {
-		const [docs, numDocs] = await Promise.all([
-			this._UserModel.find(args),
-			this._UserModel.count({}),
-		]);
-
-		return { docs, numDocs };
+		return this._UserModel.getManyDocs(args);
 	}
 
-	public async update(args: IAPUTUser): Promise<IRPUTUser> {
+	public async update(args: IAPUTUser, user: IUser): Promise<IRPUTUser> {
 		const { _id, ...updateData } = args;
-		const updatedUser = this._UserModel.findOneAndUpdate(
-			{ _id },
-			updateData,
-			{ new: true }
-		);
-		assertResourceExist(updatedUser, "user");
-		return updatedUser;
+		const userDocument = await this._UserModel
+			.findById(_id)
+			.then(doc => docToObj(doc));
+		assertResourceExist(userDocument, "user");
+		assertUserHasPermission(user, { author: userDocument._id });
+		return this._UserModel
+			.findByIdAndUpdate(_id, updateData, { new: true })
+			.then(doc => docToObj(doc));
 	}
 
 	public async delete(args: IADELETEUser): Promise<IRDELETEUser> {

@@ -16,8 +16,9 @@ export const getTypegooseOptions = (collectionName: string): IModelOptions => {
 };
 
 export function docToObj<T extends DocumentType<any>>(
-	doc: T
+	doc: T | null
 ): T extends DocumentType<infer R> ? R & IBasicDocument : any {
+	if (doc === null) return null;
 	if ((doc as any).constructor.name === "model") {
 		return (doc as any).toObject();
 	}

@@ -14,9 +14,11 @@ export async function getManyDocsFunc<T>(
 	args: IArgsManyId,
 	model: Model<any>
 ): Promise<IResponseDocsByManyId<T>> {
-	const [docs, numDocs] = await Promise.all([
-		model.find(args),
-		model.count({}),
-	]);
+	const findPromise =
+		args._ids.length > 0
+			? model.find({ _id: { $in: args._ids } })
+			: model.find();
+
+	const [docs, numDocs] = await Promise.all([findPromise, model.count({})]);
 	return { docs, numDocs };
 }
