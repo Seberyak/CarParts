@@ -4,8 +4,8 @@ import {
 	IArgsManyId,
 	IArgsId,
 	InsertStripKeysSchema,
-	IResponseDocsByManyId,
-	ResponseDocsByManyIdSchema,
+	IRPaginated,
+	RPaginatedSchema,
 	toInsertKeys,
 	UpdateStripKeysSchema,
 	toUpdateKeys,
@@ -39,9 +39,9 @@ export const AGETManyUserSchema = ArgsManyIdSchema;
 
 export type IAGETManyUser = IArgsManyId;
 
-export const RGETManyUserSchema = ResponseDocsByManyIdSchema(UserSchema);
+export const RGETManyUserSchema = RPaginatedSchema(UserSchema);
 
-export type IRGETManyUser = IResponseDocsByManyId<IUser>;
+export type IRGETManyUser = IRPaginated<IUser>;
 
 ///---------------PUT user
 

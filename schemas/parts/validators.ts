@@ -5,10 +5,12 @@ import {
 	IArgsManyId,
 	ArgsIdSchema,
 	InsertStripKeysSchema,
-	IResponseDocsByManyId,
-	ResponseDocsByManyIdSchema,
+	IRPaginated,
+	RPaginatedSchema,
 	toInsertKeys,
 	IArgsId,
+	APaginatedSchema,
+	IAPaginated,
 } from "../helper-schemas";
 
 ///---------------POST part
@@ -36,13 +38,13 @@ export type IRGETPart = IPart;
 
 ///---------------GET many part by ids
 
-export const AGETManyPartSchema = ArgsManyIdSchema;
+export const AGETManyPartSchema = ArgsManyIdSchema.keys(APaginatedSchema);
 
-export type IAGETManyPart = IArgsManyId;
+export type IAGETManyPart = IArgsManyId & IAPaginated;
 
-export const RGETManyPartSchema = ResponseDocsByManyIdSchema(PartSchema);
+export const RGETManyPartSchema = RPaginatedSchema(PartSchema);
 
-export type IRGETManyPart = IResponseDocsByManyId<IPart>;
+export type IRGETManyPart = IRPaginated<IPart>;
 
 ///---------------PUT part
 

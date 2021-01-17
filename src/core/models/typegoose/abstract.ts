@@ -1,7 +1,4 @@
-import {
-	IArgsManyId,
-	IResponseDocsByManyId,
-} from "../../../../schemas/helper-schemas";
+import { IArgsManyId, IRPaginated } from "../../../../schemas/helper-schemas";
 import { Model } from "mongoose";
 
 export abstract class AbstractModel {
@@ -13,7 +10,7 @@ export abstract class AbstractModel {
 export async function getManyDocsFunc<T>(
 	args: IArgsManyId,
 	model: Model<any>
-): Promise<IResponseDocsByManyId<T>> {
+): Promise<IRPaginated<T>> {
 	const findPromise =
 		args._ids.length > 0
 			? model.find({ _id: { $in: args._ids } })

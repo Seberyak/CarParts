@@ -3,7 +3,7 @@ import { IUser } from "../../../../schemas/user/helper-schemas";
 import { getTypegooseOptions } from "../../utils/db-config";
 import {
 	IArgsManyId,
-	IResponseDocsByManyId,
+	IRPaginated,
 	toInsertKeys,
 } from "../../../../schemas/helper-schemas";
 import { AbstractModel, getManyDocsFunc } from "./abstract";
@@ -37,7 +37,7 @@ export class User implements Omit<IUser, toInsertKeys>, AbstractModel {
 	static getManyDocs(
 		this: IUserModel,
 		args: IArgsManyId
-	): Promise<IResponseDocsByManyId<IUser>> {
+	): Promise<IRPaginated<IUser>> {
 		return getManyDocsFunc(args, this);
 	}
 }
