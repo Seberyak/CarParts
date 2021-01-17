@@ -21,13 +21,16 @@ import { jwtConstants } from "./core/services/auth/jwt.constants";
 import { JwtStrategy } from "./core/services/auth/jwt.strategy";
 import { JwtAuthGuard } from "./core/services/auth/jwt-auth.guard";
 import { AuthService } from "./core/services/auth";
+import { PartRating } from "./core/models/typegoose/parts-rating";
+import { PartsRatingController } from "./api/parts-rating/controller";
+import { PartsRatingService } from "./core/services/parts-rating";
 
 @Module({
 	imports: [
 		TypegooseModule.forRoot("mongodb://localhost:27017/nest", {
 			useNewUrlParser: true,
 		}),
-		TypegooseModule.forFeature([User, File, Part]),
+		TypegooseModule.forFeature([User, File, Part, PartRating]),
 		// MulterModule.register({ dest: "./uploads" }),
 		MulterModule.registerAsync({
 			useClass: GridFsMulterConfigService,
@@ -44,6 +47,7 @@ import { AuthService } from "./core/services/auth";
 		FilesController,
 		PartsController,
 		AuthController,
+		PartsRatingController,
 	],
 	providers: [
 		AppService,
@@ -55,6 +59,7 @@ import { AuthService } from "./core/services/auth";
 		JwtStrategy,
 		JwtAuthGuard,
 		AuthService,
+		PartsRatingService,
 	],
 })
 export class AppModule {}

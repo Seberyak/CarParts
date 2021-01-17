@@ -19,16 +19,27 @@ import {
 } from "../../utils/asserts";
 import { IUser } from "../../../../schemas/user/helper-schemas";
 import { docToObj } from "../../utils/db-config";
+import {
+	IPartRatingModel,
+	PartRating,
+} from "../../models/typegoose/parts-rating";
 
 @Injectable()
 export class PartsService {
 	constructor(
 		@InjectModel(Part)
-		private readonly _PartModel: IPartModel
+		private readonly _PartModel: IPartModel,
+
+		@InjectModel(PartRating)
+		private readonly _PartRatingModel: IPartRatingModel
 	) {}
 
 	public async create(args: IAPOSTPart, user: IUser): Promise<IRPOSTPart> {
-		const part = new this._PartModel({ ...args, author: user._id });
+		const part = new this._PartModel({
+			...args,
+			author: user._id,
+			rating: 0,
+		});
 		return part.save();
 	}
 
@@ -64,6 +75,7 @@ export class PartsService {
 			.then(doc => docToObj(doc));
 		assertResourceExist(part, "part");
 		assertUserHasPermission(user, part);
+		await this._PartRatingModel.deleteOne({ partId: args._id });
 		return this._PartModel.deleteOne(args);
 	}
 }

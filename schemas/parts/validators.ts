@@ -11,6 +11,8 @@ import {
 	IArgsId,
 	APaginatedSchema,
 	IAPaginated,
+	toUpdateKeys,
+	UpdateStripKeysSchema,
 } from "../helper-schemas";
 
 ///---------------POST part
@@ -18,9 +20,10 @@ import {
 export const APOSTPartSchema = PartSchema.keys({
 	...InsertStripKeysSchema,
 	author: Joi.any().strip(),
+	rating: Joi.any().strip(),
 });
 
-export type IAPOSTPart = Omit<IPart, toInsertKeys | "author">;
+export type IAPOSTPart = Omit<IPart, toInsertKeys | "author" | "rating">;
 
 export const RPOSTPartSchema = PartSchema;
 
@@ -48,9 +51,12 @@ export type IRGETManyPart = IRPaginated<IPart>;
 
 ///---------------PUT part
 
-export const APUTPartSchema = PartSchema;
+export const APUTPartSchema = PartSchema.keys({
+	...UpdateStripKeysSchema,
+	rating: Joi.any().strip(),
+});
 
-export type IAPUTPart = IPart;
+export type IAPUTPart = Omit<IPart, toUpdateKeys | "rating">;
 
 export const RPUTPartSchema = PartSchema;
 

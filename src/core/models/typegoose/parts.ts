@@ -37,6 +37,9 @@ export class Part implements Omit<IPart, "_id">, AbstractModel {
 	@Prop()
 	updatedAt: Date;
 
+	@Prop()
+	rating: IPart["rating"];
+
 	static async getMany(
 		this: IPartModel,
 		args: IAGETManyPart
