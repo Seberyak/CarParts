@@ -39,7 +39,7 @@ export class PartsService {
 	}
 
 	public async getMany(args: IAGETManyPart): Promise<IRGETManyPart> {
-		return this._PartModel.getManyDocs(args);
+		return this._PartModel.getMany(args);
 	}
 
 	public async update(args: IAPUTPart, user: IUser): Promise<IRPUTPart> {

@@ -19,6 +19,7 @@ import {
 } from "../../utils/asserts";
 import { IUser } from "../../../../schemas/user/helper-schemas";
 import { docToObj } from "../../utils/db-config";
+import { sha512 } from "js-sha512";
 
 @Injectable()
 export class UsersService {
@@ -29,6 +30,7 @@ export class UsersService {
 
 	public async create(args: IAPOSTUser): Promise<IRPOSTUser> {
 		const user = new this._UserModel(args);
+		user.password = sha512(user.password);
 		return user.save();
 	}
 
@@ -49,6 +51,8 @@ export class UsersService {
 			.then(doc => docToObj(doc));
 		assertResourceExist(userDocument, "user");
 		assertUserHasPermission(user, { author: userDocument._id });
+
+		updateData.password = sha512(updateData.password);
 		return this._UserModel
 			.findByIdAndUpdate(_id, updateData, { new: true })
 			.then(doc => docToObj(doc));
