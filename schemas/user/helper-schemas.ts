@@ -2,6 +2,10 @@ import Joi from "../../src/@input/joi";
 import { BasicDocumentSchema, IBasicDocument } from "../helper-schemas";
 import { ObjectId } from "bson";
 
+const PasswordRegex = new RegExp(
+	`^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$`
+);
+
 export const UserSchema = BasicDocumentSchema.keys({
 	firstName: Joi.string().required(),
 	lastName: Joi.string().required(),
@@ -10,8 +14,7 @@ export const UserSchema = BasicDocumentSchema.keys({
 		.email()
 		.required(),
 	password: Joi.string()
-		.min(8)
-		.max(16)
+		.regex(PasswordRegex)
 		.required(),
 	type: Joi.objectId().required(),
 });
