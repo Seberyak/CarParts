@@ -50,7 +50,19 @@ export interface IArgsManyId {
 	_ids: ObjectId[];
 }
 
-export const ResponseDocsByManyIdSchema = (TSchema: JoiSchema): JoiSchema =>
+///
+
+export const APaginatedSchema = {
+	from: Joi.number().required(),
+	to: Joi.number().required(),
+};
+
+export interface IAPaginated {
+	from: number;
+	to: number;
+}
+
+export const RPaginatedSchema = (TSchema: JoiSchema): JoiSchema =>
 	Joi.object({
 		numDocs: Joi.number().required(),
 		docs: Joi.array()
@@ -58,7 +70,7 @@ export const ResponseDocsByManyIdSchema = (TSchema: JoiSchema): JoiSchema =>
 			.required(),
 	});
 
-export interface IResponseDocsByManyId<T> {
+export interface IRPaginated<T> {
 	numDocs: number;
 	docs: T[];
 }
