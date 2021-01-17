@@ -1,20 +1,17 @@
-import { Controller, Delete, Get, Post, Put, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, Put, UseGuards } from "@nestjs/common";
 import { wUser, wValidatedArg } from "../../core/utils/decorators/validation";
 import {
 	ADELETEUserSchema,
 	AGETManyUserSchema,
 	AGETUserSchema,
-	APOSTUserSchema,
 	APUTUserSchema,
 	IADELETEUser,
 	IAGETManyUser,
 	IAGETUser,
-	IAPOSTUser,
 	IAPUTUser,
 	IRDELETEUser,
 	IRGETManyUser,
 	IRGETUser,
-	IRPOSTUser,
 	IRPUTUser,
 } from "../../../schemas/user/validators";
 import { UsersService } from "../../core/services/users";
@@ -25,13 +22,6 @@ import { IUser } from "../../../schemas/user/helper-schemas";
 @Controller("api/users")
 export class UsersController {
 	constructor(private readonly _UsersService: UsersService) {}
-
-	@Post("/register")
-	async create(
-		@wValidatedArg(APOSTUserSchema) args: IAPOSTUser
-	): Promise<IRPOSTUser> {
-		return this._UsersService.create(args);
-	}
 
 	@UseGuards(IsAdmin)
 	@Get(`/:_id(${ObjectIdPattern})`)
