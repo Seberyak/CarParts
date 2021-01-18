@@ -1,12 +1,12 @@
 import { IPart } from "../../../../schemas/parts/helper-schemas";
 import { modelOptions, Prop, ReturnModelType } from "@typegoose/typegoose";
 import { getTypegooseOptions } from "../../utils/db-config";
-import { AbstractModel } from "./abstract";
+import { getManyDocsFunc } from "./abstract";
 import { IRPaginated } from "../../../../schemas/helper-schemas";
 import { IAGETManyPart } from "../../../../schemas/parts/validators";
 
 @modelOptions(getTypegooseOptions("parts"))
-export class Part implements Omit<IPart, "_id">, AbstractModel {
+export class Part implements Omit<IPart, "_id"> {
 	@Prop()
 	author: IPart["author"];
 
@@ -44,18 +44,7 @@ export class Part implements Omit<IPart, "_id">, AbstractModel {
 		this: IPartModel,
 		args: IAGETManyPart
 	): Promise<IRPaginated<IPart>> {
-		const queryParams =
-			args._ids.length > 0 ? { _id: { $in: args._ids } } : {};
-
-		const [docs, numDocs] = await Promise.all([
-			this.find(queryParams)
-				.sort({ createdAt: -1 })
-				.skip(args.from)
-				.limit(Math.max(args.to - args.from, 0)),
-			this.count({}),
-		]);
-
-		return { docs, numDocs };
+		return getManyDocsFunc<IPart>(args, this);
 	}
 }
 

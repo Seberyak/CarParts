@@ -9,6 +9,8 @@ import {
 	toInsertKeys,
 	UpdateStripKeysSchema,
 	toUpdateKeys,
+	IAPaginated,
+	APaginatedSchema,
 } from "../helper-schemas";
 import { IUser, UserSchema } from "./helper-schemas";
 import Joi from "../../src/@input/joi";
@@ -35,9 +37,9 @@ export type IRGETUser = IUser;
 
 ///---------------GET many user by ids
 
-export const AGETManyUserSchema = ArgsManyIdSchema;
+export const AGETManyUserSchema = ArgsManyIdSchema.keys(APaginatedSchema);
 
-export type IAGETManyUser = IArgsManyId;
+export type IAGETManyUser = IArgsManyId & IAPaginated;
 
 export const RGETManyUserSchema = RPaginatedSchema(UserSchema);
 

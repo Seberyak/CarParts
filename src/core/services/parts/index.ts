@@ -75,7 +75,7 @@ export class PartsService {
 			.then(doc => docToObj(doc));
 		assertResourceExist(part, "part");
 		assertUserHasPermission(user, part);
-		await this._PartRatingModel.deleteOne({ partId: args._id });
+		await this._PartRatingModel.deleteMany({ partId: args._id });
 		return this._PartModel.deleteOne(args);
 	}
 }

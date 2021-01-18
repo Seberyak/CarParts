@@ -6,21 +6,22 @@ import {
 } from "../../models/typegoose/parts-rating";
 import {
 	IADELETEPartRating,
+	IAGETManyPartRating,
 	IAGETPartRating,
 	IAPOSTPartRating,
 	IAPUTPartRating,
 	IRDELETEPartRating,
+	IRGETManyPartRating,
 	IRGETPartRating,
 	IRPOSTPartRating,
 	IRPUTPartRating,
 } from "../../../../schemas/parts-rating/validators";
 import { IUser } from "../../../../schemas/user/helper-schemas";
 import { docToObj } from "../../utils/db-config";
-import { IPartRating } from "../../../../schemas/parts-rating/helper-schemas";
 import { IPartModel, Part } from "../../models/typegoose/parts";
 import { MError } from "../../utils/errors";
 import { assertResourceExist } from "../../utils/asserts";
-import { DocumentType } from "@typegoose/typegoose/lib/types";
+import { ObjectId } from "bson";
 
 @Injectable()
 export class PartsRatingService {
@@ -36,105 +37,72 @@ export class PartsRatingService {
 		args: IAPOSTPartRating,
 		user: IUser
 	): Promise<IRPOSTPartRating> {
-		let partRating = await this.getPartRatingDoc(args);
+		let partRating = await this._PartRatingModel.findOne({
+			partId: args.partId,
+			author: user._id,
+		});
 
-		if (!partRating) {
-			partRating = new this._PartRatingModel({
-				partId: args.partId,
-				rates: [],
-			});
-		}
-		if (partRating.rates.find(el => el.author.equals(user._id))) {
+		if (!!partRating) {
 			throw new MError(403, "User has already rated this part");
 		}
-		const userPartRate = { author: user._id, value: args.value };
-		partRating.rates.push(userPartRate);
-
-		await Promise.all([
-			partRating.save(),
-			this.recalculatePartRating(docToObj(partRating)),
-		]);
-		return userPartRate;
+		partRating = new this._PartRatingModel({
+			partId: args.partId,
+			author: user._id,
+			rate: args.rate,
+		});
+		await partRating.save();
+		await this.recalculatePartRating(args.partId);
+		return docToObj(partRating);
 	}
 
 	async get(args: IAGETPartRating, user: IUser): Promise<IRGETPartRating> {
 		const partRating = await this._PartRatingModel.findOne({
 			partId: args.partId,
+			author: user._id,
 		});
 		assertResourceExist(partRating, "partRating");
-		const userRatedRecord = partRating.rates.find(el =>
-			el.author.equals(user._id)
-		);
-		assertResourceExist(userRatedRecord, "userPartRate");
-		return userRatedRecord;
+		return docToObj(partRating);
+	}
+
+	async getMany(args: IAGETManyPartRating): Promise<IRGETManyPartRating> {
+		return this._PartRatingModel.getMany(args);
 	}
 
 	async update(args: IAPUTPartRating, user: IUser): Promise<IRPUTPartRating> {
-		const partRating = await this.getPartRatingDoc({ partId: args.partId });
-
-		assertResourceExist(partRating, "partRating");
-		const userRatedRecord = partRating.rates.find(el =>
-			el.author.equals(user._id)
+		const partRating = await this._PartRatingModel.findOneAndUpdate(
+			{ partId: args.partId, author: user._id },
+			{ rate: args.rate },
+			{ new: true }
 		);
-		assertResourceExist(userRatedRecord, "userPartRate");
-		userRatedRecord.value = args.value;
-
-		partRating.markModified("rates");
-		await Promise.all([
-			partRating.save(),
-			this.recalculatePartRating(partRating),
-		]);
-
-		return userRatedRecord;
+		assertResourceExist(partRating, "partRating");
+		await this.recalculatePartRating(args.partId);
+		return docToObj(partRating);
 	}
 
 	async delete(
 		args: IADELETEPartRating,
 		user: IUser
 	): Promise<IRDELETEPartRating> {
-		const partRating = await this._PartRatingModel.findOne({
+		const partRating = await this._PartRatingModel.findOneAndDelete({
 			partId: args.partId,
+			author: user._id,
 		});
 		assertResourceExist(partRating, "partRating");
 
-		const userRatedRecord = partRating.rates.find(el =>
-			el.author.equals(user._id)
-		);
-		assertResourceExist(userRatedRecord, "userPartRate");
-
-		partRating.rates = partRating.rates.filter(
-			el => !el.author.equals(user._id)
-		);
-
-		partRating.markModified("rates");
-
-		await Promise.all([
-			this.recalculatePartRating(partRating),
-			partRating.save(),
-		]);
+		await this.recalculatePartRating(args.partId);
 	}
 
-	private async recalculatePartRating(args: IPartRating): Promise<void> {
-		let sumRatingValues = 0;
-		args.rates.forEach(el => (sumRatingValues += el.value));
-		const finalRate = sumRatingValues / args.rates.length;
-		await this._PartModel.findOneAndUpdate(
-			{ _id: args.partId },
-			{ rating: finalRate }
-		);
-	}
-
-	private async getPartRatingDoc(
-		args: IAGETPartRating
-	): Promise<DocumentType<PartRating>> {
-		const [part, partRating] = await Promise.all([
-			this._PartModel.findOne({ _id: args.partId }),
-			this._PartRatingModel.findOne({
-				partId: args.partId,
-			}),
+	private async recalculatePartRating(partId: ObjectId): Promise<void> {
+		const [partRatings, part] = await Promise.all([
+			this._PartRatingModel.find({ partId }),
+			this._PartModel.findById(partId),
 		]);
-
-		assertResourceExist(part, "part");
-		return partRating;
+		if (partRatings.length === 0) part.rating = 0;
+		else {
+			let sumRatingValues = 0;
+			partRatings.forEach(el => (sumRatingValues += el.rate));
+			part.rating = sumRatingValues / partRatings.length;
+		}
+		await part.save();
 	}
 }

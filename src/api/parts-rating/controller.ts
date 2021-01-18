@@ -1,22 +1,26 @@
-import { Controller, Delete, Get, Post, Put } from "@nestjs/common";
+import { Controller, Delete, Get, Post, Put, UseGuards } from "@nestjs/common";
 import { ObjectIdPattern } from "../../core/utils/common";
 import { wUser, wValidatedArg } from "../../core/utils/decorators/validation";
 import {
 	ADELETEPartRatingSchema,
+	AGETManyPartRatingSchema,
 	AGETPartRatingSchema,
 	APOSTPartRatingSchema,
 	APUTPartRatingSchema,
 	IADELETEPartRating,
+	IAGETManyPartRating,
 	IAGETPartRating,
 	IAPOSTPartRating,
 	IAPUTPartRating,
 	IRDELETEPartRating,
+	IRGETManyPartRating,
 	IRGETPartRating,
 	IRPOSTPartRating,
 	IRPUTPartRating,
 } from "../../../schemas/parts-rating/validators";
 import { IUser } from "../../../schemas/user/helper-schemas";
 import { PartsRatingService } from "../../core/services/parts-rating";
+import { IsAdmin } from "../../core/utils/guards";
 
 @Controller("api/parts-rating")
 export class PartsRatingController {
@@ -36,6 +40,14 @@ export class PartsRatingController {
 		@wUser() user: IUser
 	): Promise<IRGETPartRating> {
 		return this._PartsRatingService.get(args, user);
+	}
+
+	@UseGuards(IsAdmin)
+	@Get("/many")
+	async getMany(
+		@wValidatedArg(AGETManyPartRatingSchema) args: IAGETManyPartRating
+	): Promise<IRGETManyPartRating> {
+		return this._PartsRatingService.getMany(args);
 	}
 
 	@Put("/")

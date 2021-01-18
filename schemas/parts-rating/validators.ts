@@ -1,22 +1,28 @@
 import Joi from "../../src/@input/joi";
-import { IUserPartRate, UserPartRateSchema } from "./helper-schemas";
 import { ObjectId } from "bson";
+import { IPartRating, PartRatingSchema } from "./helper-schemas";
+import {
+	APaginatedSchema,
+	ArgsManyIdSchema,
+	IAPaginated,
+	IArgsManyId,
+	InsertStripKeysSchema,
+	IRPaginated,
+	RPaginatedSchema,
+	toInsertKeys,
+} from "../helper-schemas";
 
 ///---------------POST part rate
 
-export const APOSTPartRatingSchema = Joi.object({
-	partId: Joi.objectId().required(),
-	value: Joi.number().required(),
+export const APOSTPartRatingSchema = PartRatingSchema.keys({
+	author: Joi.any().strip(),
+	...InsertStripKeysSchema,
 });
+export type IAPOSTPartRating = Omit<IPartRating, toInsertKeys | "author">;
 
-export type IAPOSTPartRating = {
-	partId: ObjectId;
-	value: number;
-};
+export const RPOSTPartRatingSchema = PartRatingSchema;
 
-export const RPOSTPartRatingSchema = UserPartRateSchema;
-
-export type IRPOSTPartRating = IUserPartRate;
+export type IRPOSTPartRating = IPartRating;
 
 ///---------------GET part rate
 
@@ -28,9 +34,19 @@ export interface IAGETPartRating {
 	partId: ObjectId;
 }
 
-export const RGETPartRatingSchema = UserPartRateSchema;
+export const RGETPartRatingSchema = PartRatingSchema;
 
-export type IRGETPartRating = IUserPartRate;
+export type IRGETPartRating = IPartRating;
+
+///---------------GET many part  rate #Admin
+
+export const AGETManyPartRatingSchema = ArgsManyIdSchema.keys(APaginatedSchema);
+
+export type IAGETManyPartRating = IArgsManyId & IAPaginated;
+
+export const RGETManyPartRatingSchema = RPaginatedSchema(PartRatingSchema);
+
+export type IRGETManyPartRating = IRPaginated<IPartRating>;
 
 ///---------------PUT part rate
 
@@ -38,9 +54,9 @@ export const APUTPartRatingSchema = APOSTPartRatingSchema;
 
 export type IAPUTPartRating = IAPOSTPartRating;
 
-export const RPUTPartRatingSchema = UserPartRateSchema;
+export const RPUTPartRatingSchema = PartRatingSchema;
 
-export type IRPUTPartRating = IUserPartRate;
+export type IRPUTPartRating = IPartRating;
 
 ///---------------DELETE part rate
 

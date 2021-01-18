@@ -2,6 +2,7 @@ import { modelOptions, Prop, ReturnModelType } from "@typegoose/typegoose";
 import { IUser } from "../../../../schemas/user/helper-schemas";
 import { getTypegooseOptions } from "../../utils/db-config";
 import {
+	IAPaginated,
 	IArgsManyId,
 	IRPaginated,
 	toInsertKeys,
@@ -36,9 +37,9 @@ export class User implements Omit<IUser, toInsertKeys>, AbstractModel {
 
 	static getManyDocs(
 		this: IUserModel,
-		args: IArgsManyId
+		args: IArgsManyId & IAPaginated
 	): Promise<IRPaginated<IUser>> {
-		return getManyDocsFunc(args, this);
+		return getManyDocsFunc<IUser>(args, this);
 	}
 }
 export type IUserModel = ReturnModelType<typeof User>;
