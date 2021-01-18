@@ -1,14 +1,14 @@
 import { Controller, Post, Request, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { IRPOSTLogin } from "../../../schemas/auth/validators";
-import { JwtService } from "@nestjs/jwt";
-import { docToObj } from "../../core/utils/db-config";
-import { wValidatedArg } from "../../core/utils/decorators/validation";
 import {
 	APOSTUserSchema,
 	IAPOSTUser,
+	IRPOSTLogin,
 	IRPOSTUser,
-} from "../../../schemas/user/validators";
+} from "../../../schemas/auth/validators";
+import { JwtService } from "@nestjs/jwt";
+import { docToObj } from "../../core/utils/db-config";
+import { wValidatedArg } from "../../core/utils/decorators/validation";
 import { AuthService } from "../../core/services/auth";
 
 @Controller("api/auth")

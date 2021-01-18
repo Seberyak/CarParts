@@ -1,29 +1,17 @@
 import {
-	ArgsManyIdSchema,
+	APaginatedSchema,
 	ArgsIdSchema,
-	IArgsManyId,
+	ArgsManyIdSchema,
+	IAPaginated,
 	IArgsId,
-	InsertStripKeysSchema,
+	IArgsManyId,
 	IRPaginated,
 	RPaginatedSchema,
-	toInsertKeys,
-	UpdateStripKeysSchema,
 	toUpdateKeys,
-	IAPaginated,
-	APaginatedSchema,
+	UpdateStripKeysSchema,
 } from "../helper-schemas";
 import { IUser, UserSchema } from "./helper-schemas";
 import Joi from "../../src/@input/joi";
-
-///---------------POST user
-
-export const APOSTUserSchema = UserSchema.keys(InsertStripKeysSchema);
-
-export type IAPOSTUser = Omit<IUser, toInsertKeys>;
-
-export const RPOSTUserSchema = UserSchema;
-
-export type IRPOSTUser = IUser;
 
 ///---------------GET user
 

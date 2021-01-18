@@ -5,12 +5,10 @@ import {
 	IADELETEUser,
 	IAGETManyUser,
 	IAGETUser,
-	IAPOSTUser,
 	IAPUTUser,
 	IRDELETEUser,
 	IRGETManyUser,
 	IRGETUser,
-	IRPOSTUser,
 	IRPUTUser,
 } from "../../../../schemas/user/validators";
 import {
@@ -20,6 +18,8 @@ import {
 import { IUser } from "../../../../schemas/user/helper-schemas";
 import { docToObj } from "../../utils/db-config";
 import { sha512 } from "js-sha512";
+import { IAPOSTUser, IRPOSTUser } from "../../../../schemas/auth/validators";
+import { UserTypes } from "../../../../schemas/user/user-types";
 
 @Injectable()
 export class UsersService {
@@ -29,6 +29,7 @@ export class UsersService {
 	) {}
 
 	public async create(args: IAPOSTUser): Promise<IRPOSTUser> {
+		if (!args.type) args.type = UserTypes.Default;
 		const user = new this._UserModel(args);
 		user.password = sha512(user.password);
 		return user.save();
