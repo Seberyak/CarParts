@@ -32,13 +32,19 @@ export class Part implements Omit<IPart, "_id"> {
 	title: IPart["title"];
 
 	@Prop()
+	rating: IPart["rating"];
+
+	@Prop()
+	quantity: IPart["quantity"];
+
+	@Prop()
+	barCode: IPart["barCode"];
+
+	@Prop()
 	createdAt: Date;
 
 	@Prop()
 	updatedAt: Date;
-
-	@Prop()
-	rating: IPart["rating"];
 
 	static async getMany(
 		this: IPartModel,

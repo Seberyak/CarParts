@@ -12,7 +12,7 @@ import { AbstractModel, getManyDocsFunc } from "./abstract";
 @modelOptions(getTypegooseOptions("users"))
 export class User implements Omit<IUser, toInsertKeys>, AbstractModel {
 	@Prop({ unique: true })
-	mail: IUser["mail"];
+	email: IUser["email"];
 
 	@Prop()
 	firstName: IUser["firstName"];

@@ -4,7 +4,6 @@ import {
 	UploadedFiles,
 	UseInterceptors,
 	Get,
-	HttpStatus,
 	Res,
 	Delete,
 } from "@nestjs/common";
@@ -30,10 +29,9 @@ import {
 import { wValidatedArg } from "../../core/utils/decorators/validation";
 import { ObjectIdPattern } from "../../core/utils/common";
 
-// @ApiUseTags("Attachments")
 @Controller("api/files/")
 export class FilesController {
-	constructor(private filesService: FilesService) {}
+	constructor(private _FilesService: FilesService) {}
 
 	@Post("/upload")
 	@ApiConsumes("multipart/form-data")
@@ -70,8 +68,8 @@ export class FilesController {
 		@wValidatedArg(AGETFileInfoSchema) args: IAGETFileInfo
 	): Promise<IFileInfo> {
 		const id = args._id.toString();
-		const file = await this.filesService.findInfo(id);
-		const filestream = await this.filesService.readStream(id);
+		const file = await this._FilesService.findInfo(id);
+		const filestream = await this._FilesService.readStream(id);
 		if (!filestream) {
 			throw new MError(
 				417,
@@ -90,8 +88,8 @@ export class FilesController {
 		@Res() res: any
 	): Promise<IRGETRawFile> {
 		const id = args._id.toHexString();
-		const file = await this.filesService.findInfo(id);
-		const filestream = await this.filesService.readStream(id);
+		const file = await this._FilesService.findInfo(id);
+		const filestream = await this._FilesService.readStream(id);
 		if (!filestream) {
 			throw new MError(417, "An error occurred while retrieving file");
 		}
@@ -105,13 +103,10 @@ export class FilesController {
 		@Res() res: any
 	): Promise<IRGETDownloadFile> {
 		const id = args._id.toHexString();
-		const file = await this.filesService.findInfo(id);
-		const filestream = await this.filesService.readStream(id);
+		const file = await this._FilesService.findInfo(id);
+		const filestream = await this._FilesService.readStream(id);
 		if (!filestream) {
-			throw new MError(
-				HttpStatus.EXPECTATION_FAILED,
-				"An error occurred while retrieving file"
-			);
+			throw new MError(417, "An error occurred while retrieving file");
 		}
 		res.header("Content-Type", file.contentType);
 		res.header(
@@ -126,8 +121,8 @@ export class FilesController {
 		@wValidatedArg(ADELETEFileSchema) args: IADELETEFile
 	): Promise<IFileInfo> {
 		const id = args._id.toHexString();
-		const file = await this.filesService.findInfo(id);
-		await this.filesService.deleteFile(id);
+		const file = await this._FilesService.findInfo(id);
+		await this._FilesService.deleteFile(id);
 
 		return {
 			message: "File has been deleted",

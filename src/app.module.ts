@@ -24,6 +24,7 @@ import { AuthService } from "./core/services/auth";
 import { PartRating } from "./core/models/typegoose/parts-rating";
 import { PartsRatingController } from "./api/parts-rating/controller";
 import { PartsRatingService } from "./core/services/parts-rating";
+import { ImagesModule } from "./api/files/images/module";
 
 @Module({
 	imports: [
@@ -40,6 +41,7 @@ import { PartsRatingService } from "./core/services/parts-rating";
 			secret: jwtConstants.secret,
 			signOptions: { expiresIn: "2days" },
 		}),
+		ImagesModule,
 	],
 	controllers: [
 		AppController,

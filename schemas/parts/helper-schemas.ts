@@ -11,9 +11,14 @@ export const PartSchema = BasicDocumentSchema.keys({
 	manufacturer: Joi.string(),
 	category: Joi.string().required(),
 	images: Joi.array()
-		.items(Joi.objectId())
+		.items(Joi.string())
+		.max(10)
+		.required(),
+	quantity: Joi.number()
+		.min(1)
 		.required(),
 	rating: Joi.number().required(),
+	barCode: Joi.string(),
 });
 
 export interface IPart extends IBasicDocument {
@@ -24,6 +29,8 @@ export interface IPart extends IBasicDocument {
 	oem: string;
 	manufacturer?: string;
 	category: string;
-	images: ObjectId[];
+	images: string[];
+	quantity: number;
 	rating: number;
+	barCode?: string;
 }

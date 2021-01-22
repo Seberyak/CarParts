@@ -25,7 +25,8 @@ export class ErrorFilter implements ExceptionFilter {
 			e.errorCode !== 404 &&
 			e.errorCode !== 401 &&
 			e.errorCode !== 417 &&
-			e.errorCode !== 403
+			e.errorCode !== 403 &&
+			e.errorCode !== 400
 		) {
 			outputError = true;
 		}

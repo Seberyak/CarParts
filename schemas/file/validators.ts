@@ -1,6 +1,7 @@
 import Joi from "../../src/@input/joi";
 import { FileInfoSchema, IFileInfo } from "./helper-schemas";
 import { IArgsId } from "../helper-schemas";
+import { ObjectId } from "bson";
 
 ///---------------POST file
 
@@ -8,9 +9,37 @@ export const APOSTFileSchema = Joi.any();
 
 export type IAPOSTFile = unknown;
 
-export const RPOSTFileSchema = Joi.array().items(Joi.any());
+export const RPOSTFileSchema = Joi.array().items(
+	Joi.object({
+		originalname: Joi.string().required(),
+		encoding: Joi.string().required(),
+		mimetype: Joi.string().required(),
+		id: Joi.objectId().required(),
+		filename: Joi.string().required(),
+		metadata: Joi.any().required(),
+		bucketName: Joi.string().required(),
+		chunkSize: Joi.number().required(),
+		size: Joi.number().required(),
+		md5: Joi.string().required(),
+		uploadDate: Joi.date().required(),
+		contentType: Joi.string().required(),
+	})
+);
 
-export type IRPOSTFile = any[];
+export type IRPOSTFile = {
+	originalname: string;
+	encoding: string;
+	mimetype: string;
+	id: ObjectId;
+	filename: string;
+	metadata: any;
+	bucketName: string;
+	chunkSize: number;
+	size: number;
+	md5: string;
+	uploadDate: Date;
+	contentType: string;
+}[];
 
 ///---------------GET file info
 

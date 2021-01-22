@@ -33,7 +33,7 @@ export const APOSTUserSchema = UserSchema.keys({
 });
 
 export interface IAPOSTUser extends Omit<IUser, toInsertKeys | "type"> {
-	type: ObjectId | undefined;
+	type?: ObjectId;
 }
 
 export const RPOSTUserSchema = UserSchema;

@@ -14,12 +14,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 		@InjectModel(User)
 		private readonly _UserModel: IUserModel
 	) {
-		super({ usernameField: "mail" });
+		super({ usernameField: "email" });
 	}
 
-	async validate(mail: string, password: string): Promise<IUser> {
+	async validate(email: string, password: string): Promise<IUser> {
 		const user = await this._UserModel
-			.findOne({ mail: mail, password: sha512(password) })
+			.findOne({ email: email, password: sha512(password) })
 			.then(doc => docToObj(doc));
 		if (!user) {
 			throw new MError(401, "Not Authorized");

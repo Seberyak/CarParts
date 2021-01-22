@@ -10,7 +10,7 @@ export const UserSchema = BasicDocumentSchema.keys({
 	firstName: Joi.string().required(),
 	lastName: Joi.string().required(),
 	phoneNumber: Joi.string().required(),
-	mail: Joi.string()
+	email: Joi.string()
 		.email()
 		.required(),
 	password: Joi.string()
@@ -23,7 +23,7 @@ export interface IUser extends IBasicDocument {
 	firstName: string;
 	lastName: string;
 	phoneNumber: string;
-	mail: string;
+	email: string;
 	password: string;
 	type: ObjectId;
 }

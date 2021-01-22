@@ -30,6 +30,7 @@ export class UsersService {
 
 	public async create(args: IAPOSTUser): Promise<IRPOSTUser> {
 		if (!args.type) args.type = UserTypes.Default;
+
 		const user = new this._UserModel(args);
 		user.password = sha512(user.password);
 		return user.save();
