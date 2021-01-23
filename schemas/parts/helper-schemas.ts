@@ -4,12 +4,12 @@ import { BasicDocumentSchema, IBasicDocument } from "../helper-schemas";
 
 export const PartSchema = BasicDocumentSchema.keys({
 	title: Joi.string().required(),
-	description: Joi.string().required(),
+	description: Joi.string(),
 	author: Joi.objectId().required(),
 	price: Joi.number().required(),
 	oem: Joi.string().required(),
 	manufacturer: Joi.string(),
-	category: Joi.string().required(),
+	category: Joi.string(),
 	images: Joi.array()
 		.items(Joi.string())
 		.max(10)
@@ -23,12 +23,12 @@ export const PartSchema = BasicDocumentSchema.keys({
 
 export interface IPart extends IBasicDocument {
 	title: string;
-	description: string;
+	description?: string;
 	author: ObjectId;
 	price: number;
 	oem: string;
 	manufacturer?: string;
-	category: string;
+	category?: string;
 	images: string[];
 	quantity: number;
 	rating: number;

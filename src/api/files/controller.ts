@@ -1,11 +1,8 @@
 import {
-	Post,
 	Controller,
 	UploadedFiles,
 	UseInterceptors,
-	Get,
 	Res,
-	Delete,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { ApiImplicitFile } from "@nestjs/swagger/dist/decorators/api-implicit-file.decorator";
@@ -28,12 +25,19 @@ import {
 } from "../../../schemas/file/validators";
 import { wValidatedArg } from "../../core/utils/decorators/validation";
 import { ObjectIdPattern } from "../../core/utils/common";
+import {
+	Delete,
+	Get,
+	Post,
+} from "../../core/utils/decorators/custom-requests/request-mapping";
 
-@Controller("api/files/")
+const controller = "api/files";
+
+@Controller("/")
 export class FilesController {
 	constructor(private _FilesService: FilesService) {}
 
-	@Post("/upload")
+	@Post(`${controller}/upload`)
 	@ApiConsumes("multipart/form-data")
 	@ApiImplicitFile({
 		name: "file",
@@ -63,7 +67,7 @@ export class FilesController {
 		return response;
 	}
 
-	@Get(`info/:_id(${ObjectIdPattern})`)
+	@Get(`${controller}/info/:_id(${ObjectIdPattern})`)
 	async getFileInfo(
 		@wValidatedArg(AGETFileInfoSchema) args: IAGETFileInfo
 	): Promise<IFileInfo> {
@@ -82,7 +86,7 @@ export class FilesController {
 		};
 	}
 
-	@Get(`/:_id(${ObjectIdPattern})`)
+	@Get(`${controller}/:_id(${ObjectIdPattern})`)
 	async getFile(
 		@wValidatedArg(AGETRawFileSchema) args: IAGETRawFile,
 		@Res() res: any
@@ -97,7 +101,7 @@ export class FilesController {
 		return filestream.pipe(res);
 	}
 
-	@Get(`download/:_id(${ObjectIdPattern})`)
+	@Get(`${controller}/download/:_id(${ObjectIdPattern})`)
 	async downloadFile(
 		@wValidatedArg(AGETDownloadFileSchema) args: IAGETDownloadFile,
 		@Res() res: any
@@ -116,7 +120,7 @@ export class FilesController {
 		return filestream.pipe(res);
 	}
 
-	@Delete(":_id")
+	@Delete(`${controller}/:_id(${ObjectIdPattern})`)
 	async deleteFile(
 		@wValidatedArg(ADELETEFileSchema) args: IADELETEFile
 	): Promise<IFileInfo> {

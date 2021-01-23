@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Put } from "@nestjs/common";
+import { Controller } from "@nestjs/common";
 import { PartsService } from "../../core/services/parts";
 import { wUser, wValidatedArg } from "../../core/utils/decorators/validation";
 import {
@@ -22,8 +22,17 @@ import { ObjectIdPattern } from "../../core/utils/common";
 import { IUser } from "../../../schemas/user/helper-schemas";
 import { InjectModel } from "nestjs-typegoose";
 import { IUserModel, User } from "../../core/models/typegoose/users";
+import { Request } from "express";
+import {
+	Delete,
+	Get,
+	Post,
+	Put,
+} from "../../core/utils/decorators/custom-requests/request-mapping";
 
-@Controller("api/parts/")
+const controller = "api/parts";
+
+@Controller("/")
 export class PartsController {
 	constructor(
 		private readonly _PartsService: PartsService,
@@ -31,7 +40,7 @@ export class PartsController {
 		private readonly _UserModel: IUserModel
 	) {}
 
-	@Post("/")
+	@Post(`${controller}/`)
 	async create(
 		@wValidatedArg(APOSTPartSchema) args: IAPOSTPart,
 		@wUser(this._UserModel) user: IUser
@@ -39,21 +48,21 @@ export class PartsController {
 		return this._PartsService.create(args, user);
 	}
 
-	@Get(`/:_id(${ObjectIdPattern})`)
+	@Get(`${controller}/:_id(${ObjectIdPattern})`)
 	async get(
 		@wValidatedArg(AGETPartSchema) args: IAGETPart
 	): Promise<IRGETPart> {
 		return this._PartsService.get(args);
 	}
 
-	@Get("/many")
+	@Get(`${controller}/many`)
 	async getMany(
 		@wValidatedArg(AGETManyPartSchema) args: IAGETManyPart
 	): Promise<IRGETManyPart> {
 		return this._PartsService.getMany(args);
 	}
 
-	@Put(`/`)
+	@Put(`${controller}/`)
 	async update(
 		@wValidatedArg(APUTPartSchema) args: IAPUTPart,
 		@wUser() user: IUser
@@ -61,7 +70,7 @@ export class PartsController {
 		return this._PartsService.update(args, user);
 	}
 
-	@Delete(`/:_id(${ObjectIdPattern})`)
+	@Delete(`${controller}/:_id(${ObjectIdPattern})`)
 	async delete(
 		@wValidatedArg(ADELETEPartSchema) args: IADELETEPart,
 		@wUser() user: IUser

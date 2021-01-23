@@ -1,8 +1,6 @@
 import { IPart, PartSchema } from "./helper-schemas";
 import Joi from "../../src/@input/joi";
 import {
-	ArgsManyIdSchema,
-	IArgsManyId,
 	ArgsIdSchema,
 	InsertStripKeysSchema,
 	IRPaginated,
@@ -21,10 +19,13 @@ export const APOSTPartSchema = PartSchema.keys({
 	...InsertStripKeysSchema,
 	author: Joi.any().strip(),
 	rating: Joi.any().strip(),
+	quantity: Joi.number(),
 });
 
-export type IAPOSTPart = Omit<IPart, toInsertKeys | "author" | "rating">;
-
+export interface IAPOSTPart
+	extends Omit<IPart, toInsertKeys | "author" | "rating" | "quantity"> {
+	quantity?: number;
+}
 export const RPOSTPartSchema = PartSchema;
 
 export type IRPOSTPart = IPart;
@@ -41,9 +42,9 @@ export type IRGETPart = IPart;
 
 ///---------------GET many part by ids
 
-export const AGETManyPartSchema = ArgsManyIdSchema.keys(APaginatedSchema);
+export const AGETManyPartSchema = Joi.object().keys(APaginatedSchema);
 
-export type IAGETManyPart = IArgsManyId & IAPaginated;
+export type IAGETManyPart = IAPaginated;
 
 export const RGETManyPartSchema = RPaginatedSchema(PartSchema);
 

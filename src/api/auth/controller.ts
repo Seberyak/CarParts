@@ -1,4 +1,4 @@
-import { Controller, Post, Request, UseGuards } from "@nestjs/common";
+import { Controller, Request, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {
 	APOSTUserSchema,
@@ -10,8 +10,11 @@ import { JwtService } from "@nestjs/jwt";
 import { docToObj } from "../../core/utils/db-config";
 import { wValidatedArg } from "../../core/utils/decorators/validation";
 import { AuthService } from "../../core/services/auth";
+import { Post } from "../../core/utils/decorators/custom-requests/request-mapping";
 
-@Controller("api/auth")
+const controller = "api/auth";
+
+@Controller("/")
 export class AuthController {
 	constructor(
 		private readonly _JwtService: JwtService,
@@ -19,14 +22,14 @@ export class AuthController {
 	) {}
 
 	@UseGuards(AuthGuard("local"))
-	@Post("/login")
+	@Post(`${controller}/login`)
 	async login(@Request() req): Promise<IRPOSTLogin> {
 		const user = JSON.parse(JSON.stringify(docToObj(req.user)));
 
-		return { access_token: this._JwtService.sign(user) };
+		return { "access-token": this._JwtService.sign(user) };
 	}
 
-	@Post("/register")
+	@Post(`${controller}/register`)
 	async create(
 		@wValidatedArg(APOSTUserSchema) args: IAPOSTUser
 	): Promise<IRPOSTUser> {

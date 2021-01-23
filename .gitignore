@@ -27,4 +27,9 @@ lerna-debug.log*
 *.sublime-workspace
 
 ./uploads
+
 ./client
+
+.env
+
+./hash-key

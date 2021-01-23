@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Post, Put, UseGuards } from "@nestjs/common";
+import { Controller, UseGuards } from "@nestjs/common";
 import { ObjectIdPattern } from "../../core/utils/common";
 import { wUser, wValidatedArg } from "../../core/utils/decorators/validation";
 import {
@@ -21,12 +21,20 @@ import {
 import { IUser } from "../../../schemas/user/helper-schemas";
 import { PartsRatingService } from "../../core/services/parts-rating";
 import { IsAdmin } from "../../core/utils/guards";
+import {
+	Delete,
+	Get,
+	Post,
+	Put,
+} from "../../core/utils/decorators/custom-requests/request-mapping";
 
-@Controller("api/parts-rating")
+const controller = "api/parts-rating";
+
+@Controller("/")
 export class PartsRatingController {
 	constructor(private readonly _PartsRatingService: PartsRatingService) {}
 
-	@Post("/")
+	@Post(`${controller}/`)
 	async create(
 		@wValidatedArg(APOSTPartRatingSchema) args: IAPOSTPartRating,
 		@wUser() user: IUser
@@ -34,7 +42,7 @@ export class PartsRatingController {
 		return this._PartsRatingService.create(args, user);
 	}
 
-	@Get(`/:partId(${ObjectIdPattern})`)
+	@Get(`${controller}/:partId(${ObjectIdPattern})`)
 	async get(
 		@wValidatedArg(AGETPartRatingSchema) args: IAGETPartRating,
 		@wUser() user: IUser
@@ -43,14 +51,14 @@ export class PartsRatingController {
 	}
 
 	@UseGuards(IsAdmin)
-	@Get("/many")
+	@Get(`${controller}/many`)
 	async getMany(
 		@wValidatedArg(AGETManyPartRatingSchema) args: IAGETManyPartRating
 	): Promise<IRGETManyPartRating> {
 		return this._PartsRatingService.getMany(args);
 	}
 
-	@Put("/")
+	@Put(`${controller}/`)
 	async update(
 		@wValidatedArg(APUTPartRatingSchema) args: IAPUTPartRating,
 		@wUser() user: IUser
@@ -58,7 +66,7 @@ export class PartsRatingController {
 		return this._PartsRatingService.update(args, user);
 	}
 
-	@Delete(`/:partId(${ObjectIdPattern})`)
+	@Delete(`${controller}/:partId(${ObjectIdPattern})`)
 	async delete(
 		@wValidatedArg(ADELETEPartRatingSchema) args: IADELETEPartRating,
 		@wUser() user: IUser

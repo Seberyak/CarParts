@@ -1,8 +1,4 @@
-import {
-	IAPaginated,
-	IArgsManyId,
-	IRPaginated,
-} from "../../../../schemas/helper-schemas";
+import { IAPaginated, IRPaginated } from "../../../../schemas/helper-schemas";
 import { Model } from "mongoose";
 
 export abstract class AbstractModel {
@@ -12,18 +8,16 @@ export abstract class AbstractModel {
 }
 
 export async function getManyDocsFunc<T>(
-	args: IArgsManyId & IAPaginated,
+	args: IAPaginated,
 	model: Model<any>
 ): Promise<IRPaginated<T>> {
-	const queryParams = args._ids.length > 0 ? { _id: { $in: args._ids } } : {};
-
 	const [docs, numDocs] = await Promise.all([
 		model
-			.find(queryParams)
+			.find()
 			.sort({ createdAt: -1 })
 			.skip(args.from)
 			.limit(Math.max(args.to - args.from, 0)),
-		model.count({}),
+		model.countDocuments(),
 	]);
 
 	return { docs, numDocs };

@@ -38,6 +38,7 @@ export class PartsService {
 		const part = new this._PartModel({
 			...args,
 			author: user._id,
+			quantity: args.quantity ?? 1,
 			rating: 0,
 		});
 		return part.save();

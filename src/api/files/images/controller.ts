@@ -1,8 +1,6 @@
 import {
 	Controller,
-	Get,
 	Param,
-	Post,
 	Res,
 	UploadedFile,
 	UploadedFiles,
@@ -21,10 +19,16 @@ import {
 	IRPOSTManyImage,
 } from "../../../../schemas/file/images/validators";
 import { MError } from "../../../core/utils/errors";
+import {
+	Get,
+	Post,
+} from "../../../core/utils/decorators/custom-requests/request-mapping";
 
-@Controller("api/files/image")
+const controller = "api/files/image";
+
+@Controller("/")
 export class ImageController {
-	@Post()
+	@Post(controller)
 	@UseInterceptors(
 		FileInterceptor("image", {
 			storage: diskStorage({
@@ -41,7 +45,7 @@ export class ImageController {
 		};
 	}
 
-	@Post("/many")
+	@Post(`${controller}/many`)
 	@UseInterceptors(
 		FilesInterceptor("images", 10, {
 			storage: diskStorage({
@@ -67,7 +71,7 @@ export class ImageController {
 		};
 	}
 
-	@Get(":imageName")
+	@Get(`${controller}/:imageName`)
 	async getImage(@Param("imageName") image, @Res() res) {
 		const root = "./uploads";
 		const exist = fs.existsSync(join(root, image));

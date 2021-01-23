@@ -22,7 +22,7 @@ export const RPOSTLoginSchema = Joi.object({
 });
 
 export interface IRPOSTLogin {
-	access_token: string;
+	"access-token": string;
 }
 
 ///---------------POST user
