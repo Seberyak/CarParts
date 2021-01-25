@@ -26,6 +26,9 @@ import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "./core/services/auth/jwt.constants";
 import { ImagesModule } from "./api/files/images/module";
 import { CustomMiddleware } from "./api/middlewares";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { SqlArticlesController } from "./api/sql-articles/controller";
+import { SqlArticlesService } from "./core/services/sql-articles";
 
 export const Resources = {
 	Controllers: [
@@ -35,6 +38,7 @@ export const Resources = {
 		PartsController,
 		AuthController,
 		PartsRatingController,
+		SqlArticlesController,
 	],
 
 	Providers: [
@@ -49,6 +53,7 @@ export const Resources = {
 		AuthService,
 		PartsRatingService,
 		CustomMiddleware,
+		SqlArticlesService,
 	],
 	Imports: [
 		ConfigModule.forRoot(),
@@ -64,6 +69,16 @@ export const Resources = {
 		JwtModule.register({
 			secret: jwtConstants.secret,
 			signOptions: { expiresIn: "2days" },
+		}),
+		TypeOrmModule.forRoot({
+			type: "mysql",
+			host: "localhost",
+			port: 3306,
+			username: process.env.MYSQL_USER || "root",
+			password: process.env.MYSQL_PASSWORD || "password",
+			database: process.env.MYSQL_DATABASE || "DT2019Q2",
+			entities: [],
+			synchronize: true,
 		}),
 		ImagesModule,
 	],
