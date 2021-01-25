@@ -1,8 +1,11 @@
 import { Controller, Request, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import {
+	APOSTFirebaseLoginSchema,
 	APOSTUserSchema,
+	IAPOSTFirebaseLogin,
 	IAPOSTUser,
+	IRPOSTFirebaseLogin,
 	IRPOSTLogin,
 	IRPOSTUser,
 } from "../../../schemas/auth/validators";
@@ -34,5 +37,12 @@ export class AuthController {
 		@wValidatedArg(APOSTUserSchema) args: IAPOSTUser
 	): Promise<IRPOSTUser> {
 		return this._AuthService.register(args);
+	}
+
+	@Post(`${controller}/firebase-login`)
+	async firebaseLogin(
+		@wValidatedArg(APOSTFirebaseLoginSchema) args: IAPOSTFirebaseLogin
+	): Promise<IRPOSTFirebaseLogin> {
+		return this._AuthService.firebaseLogin(args);
 	}
 }

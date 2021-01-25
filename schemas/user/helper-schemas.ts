@@ -6,24 +6,51 @@ const PasswordRegex = new RegExp(
 	`^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$`
 );
 
+export const FirebaseMetadataSchema = Joi.object({
+	uid: Joi.string().required(),
+	displayName: Joi.string()
+		.allow(null)
+		.required(),
+	email: Joi.string()
+		.email()
+		.allow(null)
+		.required(),
+	phoneNumber: Joi.string().required(),
+});
+
+export interface IFirebaseMetadata {
+	uid: string;
+	displayName: string | null;
+	email: string | null;
+	phoneNumber: string;
+}
+
 export const UserSchema = BasicDocumentSchema.keys({
-	firstName: Joi.string().required(),
-	lastName: Joi.string().required(),
+	firstName: Joi.string()
+		.allow(null)
+		.required(),
+	lastName: Joi.string()
+		.allow(null)
+		.required(),
 	phoneNumber: Joi.string().required(),
 	email: Joi.string()
 		.email()
+		.allow(null)
 		.required(),
 	password: Joi.string()
 		.regex(PasswordRegex)
+		.allow(null)
 		.required(),
 	type: Joi.objectId().required(),
+	firebaseMetadata: FirebaseMetadataSchema,
 });
 
 export interface IUser extends IBasicDocument {
-	firstName: string;
-	lastName: string;
+	firstName: string | null;
+	lastName: string | null;
 	phoneNumber: string;
-	email: string;
-	password: string;
+	email: string | null;
+	password: string | null;
 	type: ObjectId;
+	firebaseMetadata: IFirebaseMetadata;
 }

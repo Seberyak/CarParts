@@ -10,7 +10,7 @@ async function bootstrap() {
 	await app.listen(3000);
 	app.enableCors();
 	getKeyFromFile();
-	const tunnel = await localtunnel({ port: 3001, subdomain: "car-parts" });
+	const tunnel = await localtunnel({ port: 3000, subdomain: "car-parts3" });
 	console.log(`Your server is able at domain ${tunnel.url}`);
 	tunnel.on("close", () => {
 		// tunnels are closed

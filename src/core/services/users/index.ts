@@ -39,7 +39,7 @@ export class UsersService {
 	public async get(args: IAGETUser): Promise<IRGETUser> {
 		const user = await this._UserModel.findOne(args);
 		assertResourceExist(user, "user");
-		return user;
+		return docToObj(user);
 	}
 
 	public async getMany(args: IAGETManyUser): Promise<IRGETManyUser> {

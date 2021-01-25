@@ -1,7 +1,12 @@
 ///---------------POST Login
 
 import Joi from "../../src/@input/joi";
-import { IUser, UserSchema } from "../user/helper-schemas";
+import {
+	FirebaseMetadataSchema,
+	IFirebaseMetadata,
+	IUser,
+	UserSchema,
+} from "../user/helper-schemas";
 import { InsertStripKeysSchema, toInsertKeys } from "../helper-schemas";
 import { ObjectId } from "bson";
 
@@ -18,7 +23,7 @@ export interface IAPOSTLogin {
 }
 
 export const RPOSTLoginSchema = Joi.object({
-	access_token: Joi.string().required(),
+	"access-token": Joi.string().required(),
 });
 
 export interface IRPOSTLogin {
@@ -39,3 +44,13 @@ export interface IAPOSTUser extends Omit<IUser, toInsertKeys | "type"> {
 export const RPOSTUserSchema = UserSchema;
 
 export type IRPOSTUser = IUser;
+
+///---------------POST firebase-login
+
+export const APOSTFirebaseLoginSchema = FirebaseMetadataSchema;
+
+export type IAPOSTFirebaseLogin = IFirebaseMetadata;
+
+export const RPOSTFirebaseLoginUserSchema = RPOSTLoginSchema;
+
+export type IRPOSTFirebaseLogin = IRPOSTLogin;

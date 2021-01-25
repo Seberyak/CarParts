@@ -25,6 +25,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "./core/services/auth/jwt.constants";
 import { ImagesModule } from "./api/files/images/module";
+import { CustomMiddleware } from "./api/middlewares";
 
 export const Resources = {
 	Controllers: [
@@ -47,6 +48,7 @@ export const Resources = {
 		JwtAuthGuard,
 		AuthService,
 		PartsRatingService,
+		CustomMiddleware,
 	],
 	Imports: [
 		ConfigModule.forRoot(),

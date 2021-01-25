@@ -11,7 +11,7 @@ import { AbstractModel, getManyDocsFunc } from "./abstract";
 
 @modelOptions(getTypegooseOptions("users"))
 export class User implements Omit<IUser, toInsertKeys>, AbstractModel {
-	@Prop({ unique: true })
+	@Prop()
 	email: IUser["email"];
 
 	@Prop()
@@ -41,5 +41,7 @@ export class User implements Omit<IUser, toInsertKeys>, AbstractModel {
 	): Promise<IRPaginated<IUser>> {
 		return getManyDocsFunc<IUser>(args, this);
 	}
+	@Prop()
+	firebaseMetadata: IUser["firebaseMetadata"];
 }
 export type IUserModel = ReturnModelType<typeof User>;
