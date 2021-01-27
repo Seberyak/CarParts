@@ -102,3 +102,56 @@ export type IRGETCarModifications = {
 	name: string;
 	constructioninterval: string;
 }[];
+
+///---------------GET Part Categories
+
+export const PartCategoriesSchema = Joi.object({
+	id: Joi.number().required(),
+	description: Joi.string().required(),
+});
+
+export interface IPartCategories {
+	id: number;
+	description: string;
+}
+
+export const AGETPartCategoriesSchema = Joi.object({
+	modificationId: Joi.number().required(),
+	type: CarProducersSchema.required(),
+	parentId: Joi.number(),
+});
+export interface IAGETPartCategories {
+	modificationId: number;
+	type: ECarProducers;
+	parentId?: number;
+}
+
+export const RGETPartCategoriesSchema = Joi.array().items(PartCategoriesSchema);
+
+export type IRGETPartCategories = IPartCategories[];
+
+///---------------GET Section Parts
+
+export const AGETSectionPartsSchema = Joi.object({
+	modificationId: Joi.number().required(),
+	type: CarProducersSchema.required(),
+	sectionId: Joi.number().required(),
+});
+
+export interface IAGETSectionParts {
+	modificationId: number;
+	type: ECarProducers;
+	sectionId: number;
+}
+
+export const RGETSectionPartsSchema = Joi.object({
+	part_number: Joi.string().required(),
+	supplier_name: Joi.string().required(),
+	product_name: Joi.string().required(),
+});
+
+export interface IRGETSectionParts {
+	part_number: string;
+	supplier_name: string;
+	product_name: string;
+}

@@ -5,10 +5,13 @@ import {
 	IAGETCarModels,
 	IAGETCarModifications,
 	IAGETCarProducers,
+	IAGETPartCategories,
+	IAGETSectionParts,
 	ICarModificationsQueryData,
 	IRGETCarModels,
 	IRGETCarModifications,
 	IRGETCarProducers,
+	IRGETSectionParts,
 } from "../../../../schemas/sql-articles/validators";
 
 @Injectable()
@@ -112,6 +115,113 @@ export class SqlArticlesService {
 		return !productionYear
 			? response
 			: this.filterByYear(response, productionYear);
+	}
+
+	public async getPartCategories(args: IAGETPartCategories): Promise<any> {
+		const getQuery = (args: IAGETPartCategories): string => {
+			const { modificationId, type } = args;
+			const parentId = args.parentId ?? 0;
+			switch (type) {
+				case ECarProducers.passenger:
+					return `select id,description from passanger_car_trees where passangercarid=${modificationId} and parentid = ${parentId}`;
+
+				case ECarProducers.commercial:
+					return `select id,description from commercial_vehicle_trees where commercialvehicleid=${modificationId} and parentid = ${parentId}`;
+
+				case ECarProducers.motorbike:
+					return `Sselect id,description from motorbike_trees where motorbikeid=${modificationId} and parentid = ${parentId}`;
+
+				case ECarProducers.engine:
+					return `select id,description from engine_trees where engineid=${modificationId} and parentid = ${parentId}`;
+
+				case ECarProducers.axle:
+					return `select id,description from axle_trees where axleid=${modificationId} and parentid = ${parentId}`;
+			}
+		};
+		const query = getQuery(args);
+		return this.manager.query(query);
+	}
+
+	// eslint-disable-next-line max-lines-per-function
+	public async getPartsBySection(
+		args: IAGETSectionParts
+	): Promise<IRGETSectionParts> {
+		const getQuery = (args: IAGETSectionParts): string => {
+			const { modificationId, sectionId, type } = args;
+			switch (type) {
+				case ECarProducers.passenger:
+					return `SELECT al.datasupplierarticlenumber part_number,
+				s.description supplier_name, prd.description product_name
+				FROM article_links al
+				JOIN passanger_car_pds pds on al.supplierid = pds.supplierid
+				JOIN suppliers s on s.id = al.supplierid
+				JOIN passanger_car_prd prd on prd.id = al.productid
+				WHERE al.productid = pds.productid
+				AND al.linkageid = pds.passangercarid
+				AND al.linkageid = ${modificationId}
+				AND pds.nodeid = ${sectionId}
+				AND al.linkagetypeid = 2
+				ORDER BY s.description, al.datasupplierarticlenumber`;
+
+				case ECarProducers.commercial:
+					return `SELECT al.datasupplierarticlenumber part_number,
+				s.description supplier_name, prd.description product_name
+				FROM article_links al
+				JOIN commercial_vehicle_pds pds on al.supplierid = pds.supplierid
+				JOIN suppliers s on s.id = al.supplierid
+				JOIN commercial_vehicle_prd prd on prd.id = al.productid
+				WHERE al.productid = pds.productid
+				AND al.linkageid = pds.commertialvehicleid
+				AND al.linkageid = ${modificationId}
+				AND pds.nodeid = ${sectionId}
+				AND al.linkagetypeid = 16
+				ORDER BY s.description, al.datasupplierarticlenumber`;
+
+				case ECarProducers.motorbike:
+					return `SELECT al.datasupplierarticlenumber part_number,
+				s.description supplier_name, prd.description product_name
+				FROM article_links al
+				JOIN motorbike_pds pds on al.supplierid = pds.supplierid
+				JOIN suppliers s on s.id = al.supplierid
+				JOIN motorbike_prd prd on prd.id = al.productid
+				WHERE al.productid = pds.productid
+				AND al.linkageid = pds.motorbikeid
+				AND al.linkageid = ${modificationId}
+				AND pds.nodeid = ${sectionId}
+				AND al.linkagetypeid = 777
+				ORDER BY s.description, al.datasupplierarticlenumber`;
+
+				case ECarProducers.engine:
+					return `SELECT pds.engineid, al.datasupplierarticlenumber part_number,
+				prd.description product_name, s.description supplier_name
+				FROM article_links al
+				JOIN engine_pds pds on al.supplierid = pds.supplierid
+				JOIN suppliers s on s.id = al.supplierid
+				JOIN engine_prd prd on prd.id = al.productid
+				WHERE al.productid = pds.productid
+				AND al.linkageid = pds.engineid
+				AND al.linkageid = ${modificationId}
+				AND pds.nodeid = ${sectionId}
+				AND al.linkagetypeid = 14
+				ORDER BY s.description, al.datasupplierarticlenumber`;
+
+				case ECarProducers.axle:
+					return `SELECT pds.axleid, al.datasupplierarticlenumber part_number,
+				prd.description product_name, s.description supplier_name
+				FROM article_links al
+				JOIN axle_pds pds on al.supplierid = pds.supplierid
+				JOIN suppliers s on s.id = al.supplierid
+				JOIN axle_prd prd on prd.id = al.productid
+				WHERE al.productid = pds.productid
+				AND al.linkageid = pds.axleid
+				AND al.linkageid = ${modificationId}
+				AND pds.nodeid = ${sectionId}
+				AND al.linkagetypeid = 19
+				ORDER BY s.description, al.datasupplierarticlenumber`;
+			}
+		};
+		const query = getQuery(args);
+		return this.manager.query(query);
 	}
 
 	private filterByYear<T extends { constructioninterval: string }>(

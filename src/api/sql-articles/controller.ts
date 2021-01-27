@@ -6,12 +6,18 @@ import {
 	AGETCarModelsSchema,
 	AGETCarModificationsSchema,
 	AGETCarProducersSchema,
+	AGETPartCategoriesSchema,
+	AGETSectionPartsSchema,
 	IAGETCarModels,
 	IAGETCarModifications,
 	IAGETCarProducers,
+	IAGETPartCategories,
+	IAGETSectionParts,
 	IRGETCarModels,
 	IRGETCarModifications,
 	IRGETCarProducers,
+	IRGETPartCategories,
+	IRGETSectionParts,
 } from "../../../schemas/sql-articles/validators";
 
 const controller = "api/sql-articles";
@@ -39,5 +45,19 @@ export class SqlArticlesController {
 		@wValidatedArg(AGETCarModificationsSchema) args: IAGETCarModifications
 	): Promise<IRGETCarModifications> {
 		return this._SqlArticlesService.getModifications(args);
+	}
+
+	@Get(`${controller}/part-categories`)
+	async getPartCategories(
+		@wValidatedArg(AGETPartCategoriesSchema) args: IAGETPartCategories
+	): Promise<IRGETPartCategories> {
+		return this._SqlArticlesService.getPartCategories(args);
+	}
+
+	@Get(`${controller}/parts-by-section`)
+	async getPartsBySection(
+		@wValidatedArg(AGETSectionPartsSchema) args: IAGETSectionParts
+	): Promise<IRGETSectionParts> {
+		return this._SqlArticlesService.getPartsBySection(args);
 	}
 }
