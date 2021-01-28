@@ -1,29 +1,18 @@
 import Joi from "../../src/@input/joi";
-
-export enum ECarProducers {
-	passenger = "passenger",
-	commercial = "commercial",
-	motorbike = "motorbike",
-	engine = "engine",
-	axle = "axle",
-}
-
-export const CarProducersSchema = Joi.string().valid(
-	ECarProducers.axle,
-	ECarProducers.commercial,
-	ECarProducers.engine,
-	ECarProducers.motorbike,
-	ECarProducers.passenger
-);
+import {
+	CarProducersTypesSchema,
+	ECarProducerTypes,
+	ELinkageTypes,
+} from "./helper-schemas";
 
 ///---------------GET Car Producers
 
 export const AGETCarProducersSchema = Joi.object({
-	type: CarProducersSchema.required(),
+	type: CarProducersTypesSchema.required(),
 });
 
 export interface IAGETCarProducers {
-	type: ECarProducers;
+	type: ECarProducerTypes;
 }
 
 export const RGETCarProducersSchema = Joi.object({
@@ -40,14 +29,14 @@ export interface IRGETCarProducers {
 
 export const AGETCarModelsSchema = Joi.object({
 	producerId: Joi.number().required(),
-	type: CarProducersSchema.required(),
+	type: CarProducersTypesSchema.required(),
 	pattern: Joi.string(),
 	productionYear: Joi.number(),
 });
 
 export interface IAGETCarModels {
 	producerId: number;
-	type: ECarProducers;
+	type: ECarProducerTypes;
 	pattern?: string;
 	productionYear?: number;
 }
@@ -117,12 +106,12 @@ export interface IPartCategories {
 
 export const AGETPartCategoriesSchema = Joi.object({
 	modificationId: Joi.number().required(),
-	type: CarProducersSchema.required(),
+	type: CarProducersTypesSchema.required(),
 	parentId: Joi.number(),
 });
 export interface IAGETPartCategories {
 	modificationId: number;
-	type: ECarProducers;
+	type: ECarProducerTypes;
 	parentId?: number;
 }
 
@@ -134,13 +123,13 @@ export type IRGETPartCategories = IPartCategories[];
 
 export const AGETSectionPartsSchema = Joi.object({
 	modificationId: Joi.number().required(),
-	type: CarProducersSchema.required(),
+	type: CarProducersTypesSchema.required(),
 	sectionId: Joi.number().required(),
 });
 
 export interface IAGETSectionParts {
 	modificationId: number;
-	type: ECarProducers;
+	type: ECarProducerTypes;
 	sectionId: number;
 }
 
@@ -154,4 +143,30 @@ export interface IRGETSectionParts {
 	part_number: string;
 	supplier_name: string;
 	product_name: string;
+}
+
+///---------------GET Autocomplete by OEM
+
+export interface IArticleLinks {
+	supplierid: number;
+	productid: number;
+	linkagetypeid: ELinkageTypes;
+	linkageid: number;
+	datasupplierarticlenumber: string;
+}
+
+export interface IGroupByLinkageType {
+	passenger: IArticleLinks[];
+	commercial: IArticleLinks[];
+	motorbike: IArticleLinks[];
+	engine: IArticleLinks[];
+	axle: IArticleLinks[];
+}
+
+export const AGETAutocompleteByOemSchema = Joi.object({
+	oem: Joi.string().required(),
+});
+
+export interface IAGETAutocompleteByOem {
+	oem: string;
 }

@@ -3,11 +3,13 @@ import { Get } from "../../core/utils/decorators/custom-requests/request-mapping
 import { SqlArticlesService } from "../../core/services/sql-articles";
 import { wValidatedArg } from "../../core/utils/decorators/validation";
 import {
+	AGETAutocompleteByOemSchema,
 	AGETCarModelsSchema,
 	AGETCarModificationsSchema,
 	AGETCarProducersSchema,
 	AGETPartCategoriesSchema,
 	AGETSectionPartsSchema,
+	IAGETAutocompleteByOem,
 	IAGETCarModels,
 	IAGETCarModifications,
 	IAGETCarProducers,
@@ -59,5 +61,12 @@ export class SqlArticlesController {
 		@wValidatedArg(AGETSectionPartsSchema) args: IAGETSectionParts
 	): Promise<IRGETSectionParts> {
 		return this._SqlArticlesService.getPartsBySection(args);
+	}
+	@Get(`${controller}/autocomplete-by-oem`)
+	async getAutoCompleteByOem(
+		@wValidatedArg(AGETAutocompleteByOemSchema)
+		args: IAGETAutocompleteByOem
+	): Promise<any> {
+		return this._SqlArticlesService.getAutoCompleteByOem(args);
 	}
 }
