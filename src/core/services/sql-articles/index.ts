@@ -1,22 +1,26 @@
+/* eslint-disable max-lines */
 import { Injectable } from "@nestjs/common";
 import { Connection, EntityManager } from "typeorm";
 import {
 	IAGETAutocompleteByOem,
 	IAGETCarModels,
 	IAGETCarModifications,
-	IAGETCarProducers,
+	IAGETCarManufacturers,
 	IAGETPartCategories,
 	IAGETSectionParts,
 	IArticleLinks,
 	ICarModificationsQueryData,
+	IRCarsTree,
 	IRGETCarModels,
 	IRGETCarModifications,
-	IRGETCarProducers,
+	IRGETCarManufacturers,
 	IRGETPartCategories,
 	IRGETSectionParts,
+	ICarsTreeRawData,
 } from "../../../../schemas/sql-articles/validators";
-import { ECarProducerTypes } from "../../../../schemas/sql-articles/helper-schemas";
+import { ECarManufacturerTypes } from "../../../../schemas/sql-articles/helper-schemas";
 import { SqlArticlesHelper } from "./helpers";
+import { assertResourceExist } from "../../utils/asserts";
 
 @Injectable()
 export class SqlArticlesService {
@@ -27,9 +31,9 @@ export class SqlArticlesService {
 		this.Helper = new SqlArticlesHelper();
 	}
 
-	public getCarProducers(
-		args: IAGETCarProducers
-	): Promise<IRGETCarProducers> {
+	public getCarManufacturers(
+		args: IAGETCarManufacturers
+	): Promise<IRGETCarManufacturers> {
 		const { type } = args;
 		const where = this.Helper.getWhereConditionByType(type);
 		const order = type === "motorbike" ? "description" : "matchcode";
@@ -39,14 +43,14 @@ export class SqlArticlesService {
 	}
 
 	public async getCarModels(args: IAGETCarModels): Promise<IRGETCarModels> {
-		const { producerId, type, pattern, productionYear } = args;
+		const { manufacturerId, type, pattern, productionYear } = args;
 		let where = this.Helper.getWhereConditionByType(type);
 		if (!!pattern) where += `AND description LIKE '${pattern} %'`;
 
 		const query = `SELECT id, description name, constructioninterval
 		FROM models
 		WHERE canbedisplayed = 'True'
-		AND manufacturerid = ${producerId} ${where} ORDER BY description`;
+		AND manufacturerid = ${manufacturerId} ${where} ORDER BY description`;
 
 		const data: IRGETCarModels = await this.manager.query(query);
 		return !productionYear
@@ -60,35 +64,35 @@ export class SqlArticlesService {
 		const { modelId, type, productionYear } = args;
 		let query;
 		switch (type) {
-			case ECarProducerTypes.passenger:
+			case ECarManufacturerTypes.passenger:
 				query = `SELECT id, fulldescription name, a.attributegroup, a.attributetype,
 				a.displaytitle, a.displayvalue FROM passanger_cars pc
 				LEFT JOIN passanger_car_attributes a on pc.id = a.passangercarid
 				WHERE canbedisplayed = 'True'
 				AND modelid = ${modelId} AND ispassengercar = 'True'`;
 				break;
-			case ECarProducerTypes.commercial:
+			case ECarManufacturerTypes.commercial:
 				query = `SELECT id, fulldescription name, a.attributegroup, a.attributetype, a.displaytitle, a.displayvalue
 				FROM commercial_vehicles cv
 				LEFT JOIN commercial_vehicle_attributes a on cv.id = a.commercialvehicleid
 				WHERE canbedisplayed = 'True'
 				AND modelid = ${modelId} AND iscommercialvehicle = 'True'`;
 				break;
-			case ECarProducerTypes.motorbike:
+			case ECarManufacturerTypes.motorbike:
 				query = `SELECT id, fulldescription name, a.attributegroup, a.attributetype, a.displaytitle, a.displayvalue
 				FROM motorbikes m
 				LEFT JOIN motorbike_attributes a on m.id = a.motorbikeid
 				WHERE canbedisplayed = 'True'
 				AND modelid = ${modelId} AND ismotorbike = 'True'`;
 				break;
-			case ECarProducerTypes.engine:
+			case ECarManufacturerTypes.engine:
 				query = `SELECT id, fulldescription name, salesDescription, a.attributegroup,
 				a.attributetype, a.displaytitle, a.displayvalue FROM engines e
 				LEFT JOIN engine_attributes a on e.id= a.engineid
 				WHERE canbedisplayed = 'True'
 				AND manufacturerId = ${modelId} AND isengine = 'True'`;
 				break;
-			case ECarProducerTypes.axle:
+			case ECarManufacturerTypes.axle:
 				query = `SELECT id, fulldescription name, a.attributegroup, a.attributetype, a.displaytitle, a.displayvalue
 				FROM axles ax
 				LEFT JOIN axle_attributes a on ax.id= a.axleid
@@ -116,19 +120,19 @@ export class SqlArticlesService {
 			const { modificationId, type } = partCategoriesArgs;
 			const parentId = partCategoriesArgs.parentId ?? 0;
 			switch (type) {
-				case ECarProducerTypes.passenger:
+				case ECarManufacturerTypes.passenger:
 					return `select id,description from passanger_car_trees where passangercarid=${modificationId} and parentid = ${parentId}`;
 
-				case ECarProducerTypes.commercial:
+				case ECarManufacturerTypes.commercial:
 					return `select id,description from commercial_vehicle_trees where commercialvehicleid=${modificationId} and parentid = ${parentId}`;
 
-				case ECarProducerTypes.motorbike:
+				case ECarManufacturerTypes.motorbike:
 					return `select id,description from motorbike_trees where motorbikeid=${modificationId} and parentid = ${parentId}`;
 
-				case ECarProducerTypes.engine:
+				case ECarManufacturerTypes.engine:
 					return `select id,description from engine_trees where engineid=${modificationId} and parentid = ${parentId}`;
 
-				case ECarProducerTypes.axle:
+				case ECarManufacturerTypes.axle:
 					return `select id,description from axle_trees where axleid=${modificationId} and parentid = ${parentId}`;
 			}
 		};
@@ -143,7 +147,7 @@ export class SqlArticlesService {
 		const getQuery = (args: IAGETSectionParts): string => {
 			const { modificationId, sectionId, type } = args;
 			switch (type) {
-				case ECarProducerTypes.passenger:
+				case ECarManufacturerTypes.passenger:
 					return `SELECT al.datasupplierarticlenumber part_number,
 				s.description supplier_name, prd.description product_name
 				FROM article_links al
@@ -157,7 +161,7 @@ export class SqlArticlesService {
 				AND al.linkagetypeid = 2
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
-				case ECarProducerTypes.commercial:
+				case ECarManufacturerTypes.commercial:
 					return `SELECT al.datasupplierarticlenumber part_number,
 				s.description supplier_name, prd.description product_name
 				FROM article_links al
@@ -171,7 +175,7 @@ export class SqlArticlesService {
 				AND al.linkagetypeid = 16
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
-				case ECarProducerTypes.motorbike:
+				case ECarManufacturerTypes.motorbike:
 					return `SELECT al.datasupplierarticlenumber part_number,
 				s.description supplier_name, prd.description product_name
 				FROM article_links al
@@ -185,7 +189,7 @@ export class SqlArticlesService {
 				AND al.linkagetypeid = 777
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
-				case ECarProducerTypes.engine:
+				case ECarManufacturerTypes.engine:
 					return `SELECT pds.engineid, al.datasupplierarticlenumber part_number,
 				prd.description product_name, s.description supplier_name
 				FROM article_links al
@@ -199,7 +203,7 @@ export class SqlArticlesService {
 				AND al.linkagetypeid = 14
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
-				case ECarProducerTypes.axle:
+				case ECarManufacturerTypes.axle:
 					return `SELECT pds.axleid, al.datasupplierarticlenumber part_number,
 				prd.description product_name, s.description supplier_name
 				FROM article_links al
@@ -226,6 +230,7 @@ export class SqlArticlesService {
 			`select * from article_links where datasupplierarticlenumber = '${args.oem}';`
 		);
 		if (!articleLinks.length) {
+			assertResourceExist(undefined, "part");
 			isBrand = false;
 			return {
 				isBrand,
@@ -236,50 +241,64 @@ export class SqlArticlesService {
 		const groupedByLinkageType = this.Helper.groupByLinkageType(
 			articleLinks
 		);
-		const carProducerType: ECarProducerTypes = this.Helper.getCarProducerTypeFromGroupedArticleLinks(
+		const carManufacturerType: ECarManufacturerTypes = this.Helper.getCarManufacturerTypeFromGroupedArticleLinks(
 			groupedByLinkageType
 		);
-		const typedArticleLinks = groupedByLinkageType[carProducerType];
+		const typedArticleLinks = groupedByLinkageType[carManufacturerType];
 		const modificationIds = typedArticleLinks.map(el => el.linkageid);
-		const modifications = await this.getModificationsByIds({
-			type: carProducerType,
-			ids: modificationIds,
-		});
-		const groupedModifications = this.Helper.groupModificationsById(
-			modifications
+		return this.getCarsTreeByModificationIds(
+			modificationIds,
+			carManufacturerType
 		);
-		const models = await this.getModelsByModificationIds({
-			type: carProducerType,
-			ids: modificationIds,
-		});
-		return {
-			modifications: groupedModifications,
-			models: models,
-			articleLinks: articleLinks,
-			isBrand: isBrand,
-		};
+	}
+	// TODO add queries to another types
+	private async getCarsTreeByModificationIds(
+		ids: number[],
+		type: ECarManufacturerTypes
+	): Promise<any> {
+		let query: string;
+
+		switch (type) {
+			case ECarManufacturerTypes.passenger:
+				query = `select distinct mfct.id manufacturerId, mfct.description manufacturer, m.id modelId, m.description  model,
+       pcars.id modificationId ,pcars.description modification, pcars.constructioninterval from passanger_cars pcars
+       join models m on pcars.modelid=m.id join manufacturers mfct on m.manufacturerid=mfct.id
+        where pcars.id in ${this.Helper.arrayToSqlQueryList(ids)}`;
+				break;
+			case ECarManufacturerTypes.motorbike:
+				break;
+			case ECarManufacturerTypes.engine:
+				break;
+			case ECarManufacturerTypes.commercial:
+				break;
+			case ECarManufacturerTypes.axle:
+				break;
+		}
+		const data: ICarsTreeRawData = await this.manager.query(query);
+		const res: IRCarsTree = this.Helper.createCarsTreeByQueryData(data);
+		return { cars: res };
 	}
 
 	public async getModelsByModificationIds(args: {
-		type: ECarProducerTypes;
+		type: ECarManufacturerTypes;
 		ids: number[];
 	}): Promise<IRGETCarModels> {
-		const getQuery = (type: ECarProducerTypes): string => {
+		const getQuery = (type: ECarManufacturerTypes): string => {
 			const query = `select distinct modelid id, description name, constructioninterval from`;
 			switch (type) {
-				case ECarProducerTypes.passenger:
+				case ECarManufacturerTypes.passenger:
 					return `${query} passanger_cars where id in `;
 
-				case ECarProducerTypes.commercial:
+				case ECarManufacturerTypes.commercial:
 					return `${query} commercial_vehicles where id in `;
 
-				case ECarProducerTypes.motorbike:
+				case ECarManufacturerTypes.motorbike:
 					return `${query} motorbikes where id in `;
 
-				case ECarProducerTypes.engine:
+				case ECarManufacturerTypes.engine:
 					return `${query} engines where id in `;
 
-				case ECarProducerTypes.axle:
+				case ECarManufacturerTypes.axle:
 					return `${query} axles where id in `;
 			}
 		};
@@ -293,41 +312,41 @@ export class SqlArticlesService {
 	}
 
 	public async getModificationsByIds(args: {
-		type: ECarProducerTypes;
+		type: ECarManufacturerTypes;
 		ids: number[];
 	}): Promise<ICarModificationsQueryData[]> {
 		const { type, ids } = args;
 		let query: string;
 		switch (type) {
-			case ECarProducerTypes.passenger:
+			case ECarManufacturerTypes.passenger:
 				query = `SELECT id, fulldescription name, a.attributegroup, a.attributetype,
 				a.displaytitle, a.displayvalue FROM passanger_cars pc
 				LEFT JOIN passanger_car_attributes a on pc.id = a.passangercarid
 				WHERE canbedisplayed = 'True'
 				AND ispassengercar = 'True'`;
 				break;
-			case ECarProducerTypes.commercial:
+			case ECarManufacturerTypes.commercial:
 				query = `SELECT id, fulldescription name, a.attributegroup, a.attributetype, a.displaytitle, a.displayvalue
 				FROM commercial_vehicles cv
 				LEFT JOIN commercial_vehicle_attributes a on cv.id = a.commercialvehicleid
 				WHERE canbedisplayed = 'True'
 				AND iscommercialvehicle = 'True'`;
 				break;
-			case ECarProducerTypes.motorbike:
+			case ECarManufacturerTypes.motorbike:
 				query = `SELECT id, fulldescription name, a.attributegroup, a.attributetype, a.displaytitle, a.displayvalue
 				FROM motorbikes m
 				LEFT JOIN motorbike_attributes a on m.id = a.motorbikeid
 				WHERE canbedisplayed = 'True'
 				AND ismotorbike = 'True'`;
 				break;
-			case ECarProducerTypes.engine:
+			case ECarManufacturerTypes.engine:
 				query = `SELECT id, fulldescription name, salesDescription, a.attributegroup,
 				a.attributetype, a.displaytitle, a.displayvalue FROM engines e
 				LEFT JOIN engine_attributes a on e.id= a.engineid
 				WHERE canbedisplayed = 'True'
 				AND isengine = 'True'`;
 				break;
-			case ECarProducerTypes.axle:
+			case ECarManufacturerTypes.axle:
 				query = `SELECT id, fulldescription name, a.attributegroup, a.attributetype, a.displaytitle, a.displayvalue
 				FROM axles ax
 				LEFT JOIN axle_attributes a on ax.id= a.axleid

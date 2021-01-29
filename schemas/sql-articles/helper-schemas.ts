@@ -1,6 +1,6 @@
 import Joi from "../../src/@input/joi";
 
-export enum ECarProducerTypes {
+export enum ECarManufacturerTypes {
 	passenger = "passenger",
 	commercial = "commercial",
 	motorbike = "motorbike",
@@ -8,12 +8,12 @@ export enum ECarProducerTypes {
 	axle = "axle",
 }
 
-export const CarProducersTypesSchema = Joi.string().valid(
-	ECarProducerTypes.axle,
-	ECarProducerTypes.commercial,
-	ECarProducerTypes.engine,
-	ECarProducerTypes.motorbike,
-	ECarProducerTypes.passenger
+export const CarManufacturersTypesSchema = Joi.string().valid(
+	ECarManufacturerTypes.axle,
+	ECarManufacturerTypes.commercial,
+	ECarManufacturerTypes.engine,
+	ECarManufacturerTypes.motorbike,
+	ECarManufacturerTypes.passenger
 );
 
 export enum ELinkageTypes {

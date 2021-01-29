@@ -3,9 +3,15 @@ import {
 	ICarModificationsQueryData,
 	IGroupByLinkageType,
 	IRGETCarModifications,
+	ICarsTreeManufacturerLevel,
+	ICarsTreeModelLevel,
+	ICarsTreeModificationLevel,
+	ICarsTreeRawElement,
+	ICarsTreeRawData,
+	IRCarsTree,
 } from "../../../../../schemas/sql-articles/validators";
 import {
-	ECarProducerTypes,
+	ECarManufacturerTypes,
 	ELinkageTypes,
 } from "../../../../../schemas/sql-articles/helper-schemas";
 
@@ -32,15 +38,15 @@ export class SqlArticlesHelper {
 			.filter(el => !!el);
 	}
 
-	//// get car producer type by comparing elements and getting max length of same linkageTypeId
-	public getCarProducerTypeFromGroupedArticleLinks(
+	//// get car manufacturer type by comparing elements and getting max length of same linkageTypeId
+	public getCarManufacturerTypeFromGroupedArticleLinks(
 		args: IGroupByLinkageType
-	): ECarProducerTypes {
-		const res: { type: ECarProducerTypes; length: number }[] = [];
+	): ECarManufacturerTypes {
+		const res: { type: ECarManufacturerTypes; length: number }[] = [];
 		for (const key in args) {
 			if (args.hasOwnProperty(key)) {
 				res.push({
-					type: ECarProducerTypes[key],
+					type: ECarManufacturerTypes[key],
 					length: args[key].length,
 				});
 			}
@@ -74,17 +80,17 @@ export class SqlArticlesHelper {
 		});
 	}
 
-	public getWhereConditionByType(type: ECarProducerTypes): string {
+	public getWhereConditionByType(type: ECarManufacturerTypes): string {
 		switch (type) {
-			case ECarProducerTypes.passenger:
+			case ECarManufacturerTypes.passenger:
 				return " AND ispassengercar = 'True'";
-			case ECarProducerTypes.commercial:
+			case ECarManufacturerTypes.commercial:
 				return " AND iscommercialvehicle = 'True'";
-			case ECarProducerTypes.motorbike:
+			case ECarManufacturerTypes.motorbike:
 				return " AND ismotorbike  = 'True' AND haslink = 'True'";
-			case ECarProducerTypes.engine:
+			case ECarManufacturerTypes.engine:
 				return " AND isengine = 'True'";
-			case ECarProducerTypes.axle:
+			case ECarManufacturerTypes.axle:
 				return " AND isaxle = 'True'";
 		}
 	}
@@ -116,5 +122,57 @@ export class SqlArticlesHelper {
 			}
 		});
 		return grouped;
+	}
+	public createCarsTreeByQueryData(args: ICarsTreeRawData): IRCarsTree {
+		const res: IRCarsTree = {};
+		const manufacturersSet = new Set<number>();
+		const modelsSet = new Set<number>();
+		const modificationsSet = new Set<number>();
+		args.forEach(el => {
+			if (manufacturersSet.has(el.manufacturerId)) {
+				if (
+					modelsSet.has(el.modelId) &&
+					!modificationsSet.has(el.modificationId)
+				) {
+					res[el.manufacturer][el.model][
+						el.modification
+					] = this.getNewCarTreeModificationLevel(el);
+				} else {
+					res[el.manufacturer][
+						el.model
+					] = this.getNewCarTreeModelLevel(el);
+				}
+			} else {
+				res[el.manufacturer] = this.getNewCarTreeManufacturerLevel(el);
+			}
+			manufacturersSet.add(el.manufacturerId);
+			modelsSet.add(el.modelId);
+			modificationsSet.add(el.modificationId);
+		});
+
+		return res;
+	}
+
+	private getNewCarTreeManufacturerLevel(
+		args: ICarsTreeRawElement
+	): ICarsTreeManufacturerLevel {
+		return {
+			[args.model]: this.getNewCarTreeModelLevel(args),
+		};
+	}
+
+	private getNewCarTreeModelLevel(
+		args: ICarsTreeRawElement
+	): ICarsTreeModelLevel {
+		return {
+			[args.modification]: this.getNewCarTreeModificationLevel(args),
+		};
+	}
+	private getNewCarTreeModificationLevel(
+		args: ICarsTreeRawElement
+	): ICarsTreeModificationLevel {
+		return {
+			constructioninterval: args.constructioninterval,
+		};
 	}
 }
