@@ -1,37 +1,26 @@
 import Joi from "../../src/@input/joi";
+import {
+	CarManufacturersTypesSchema,
+	ECarManufacturerTypes,
+	ELinkageTypes,
+} from "./helper-schemas";
 
-export enum ECarProducers {
-	passenger = "passenger",
-	commercial = "commercial",
-	motorbike = "motorbike",
-	engine = "engine",
-	axle = "axle",
-}
+///---------------GET Car Manufacturers
 
-export const CarProducersSchema = Joi.string().valid(
-	ECarProducers.axle,
-	ECarProducers.commercial,
-	ECarProducers.engine,
-	ECarProducers.motorbike,
-	ECarProducers.passenger
-);
-
-///---------------GET Car Producers
-
-export const AGETCarProducersSchema = Joi.object({
-	type: CarProducersSchema.required(),
+export const AGETCarManufacturersSchema = Joi.object({
+	type: CarManufacturersTypesSchema.required(),
 });
 
-export interface IAGETCarProducers {
-	type: ECarProducers;
+export interface IAGETCarManufacturers {
+	type: ECarManufacturerTypes;
 }
 
-export const RGETCarProducersSchema = Joi.object({
+export const RGETCarManufacturersSchema = Joi.object({
 	id: Joi.number().required(),
 	name: Joi.string().required(),
 });
 
-export interface IRGETCarProducers {
+export interface IRGETCarManufacturers {
 	id: number;
 	name: number;
 }
@@ -39,15 +28,15 @@ export interface IRGETCarProducers {
 ///---------------GET Car Models
 
 export const AGETCarModelsSchema = Joi.object({
-	producerId: Joi.number().required(),
-	type: CarProducersSchema.required(),
+	manufacturerId: Joi.number().required(),
+	type: CarManufacturersTypesSchema.required(),
 	pattern: Joi.string(),
 	productionYear: Joi.number(),
 });
 
 export interface IAGETCarModels {
-	producerId: number;
-	type: ECarProducers;
+	manufacturerId: number;
+	type: ECarManufacturerTypes;
 	pattern?: string;
 	productionYear?: number;
 }
@@ -102,3 +91,104 @@ export type IRGETCarModifications = {
 	name: string;
 	constructioninterval: string;
 }[];
+
+///---------------GET Part Categories
+
+export const PartCategoriesSchema = Joi.object({
+	id: Joi.number().required(),
+	description: Joi.string().required(),
+});
+
+export interface IPartCategories {
+	id: number;
+	description: string;
+}
+
+export const AGETPartCategoriesSchema = Joi.object({
+	modificationId: Joi.number().required(),
+	type: CarManufacturersTypesSchema.required(),
+	parentId: Joi.number(),
+});
+export interface IAGETPartCategories {
+	modificationId: number;
+	type: ECarManufacturerTypes;
+	parentId?: number;
+}
+
+export const RGETPartCategoriesSchema = Joi.array().items(PartCategoriesSchema);
+
+export type IRGETPartCategories = IPartCategories[];
+
+///---------------GET Section Parts
+
+export const AGETSectionPartsSchema = Joi.object({
+	modificationId: Joi.number().required(),
+	type: CarManufacturersTypesSchema.required(),
+	sectionId: Joi.number().required(),
+});
+
+export interface IAGETSectionParts {
+	modificationId: number;
+	type: ECarManufacturerTypes;
+	sectionId: number;
+}
+
+export const RGETSectionPartsSchema = Joi.object({
+	part_number: Joi.string().required(),
+	supplier_name: Joi.string().required(),
+	product_name: Joi.string().required(),
+});
+
+export interface IRGETSectionParts {
+	part_number: string;
+	supplier_name: string;
+	product_name: string;
+}
+
+///---------------GET Autocomplete by OEM
+
+export interface IArticleLinks {
+	supplierid: number;
+	productid: number;
+	linkagetypeid: ELinkageTypes;
+	linkageid: number;
+	datasupplierarticlenumber: string;
+}
+
+export interface IGroupByLinkageType {
+	passenger: IArticleLinks[];
+	commercial: IArticleLinks[];
+	motorbike: IArticleLinks[];
+	engine: IArticleLinks[];
+	axle: IArticleLinks[];
+}
+
+export interface ICarsTreeRawElement {
+	manufacturerId: number;
+	manufacturer: string;
+	modelId: number;
+	model: string;
+	modificationId: number;
+	modification: string;
+	constructioninterval: string;
+}
+
+export type ICarsTreeRawData = ICarsTreeRawElement[];
+
+export type ICarsTreeManufacturerLevel = Record<string, ICarsTreeModelLevel>;
+
+export type ICarsTreeModelLevel = Record<string, ICarsTreeModificationLevel>;
+
+export type ICarsTreeModificationLevel = {
+	constructioninterval: string;
+};
+
+export type IRCarsTree = Record<string, ICarsTreeManufacturerLevel>;
+
+export const AGETAutocompleteByOemSchema = Joi.object({
+	oem: Joi.string().required(),
+});
+
+export interface IAGETAutocompleteByOem {
+	oem: string;
+}
