@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
-import * as fs from "fs";
-import { join } from "path";
+require("dotenv").config();
+
 export function encode(key: string, plainText: string): string {
 	const hashedKey = crypto
 		.createHash("sha256")
@@ -23,11 +23,12 @@ export function decode(key: string, cipherText: string): string {
 }
 
 export function getKeyFromFile(): string {
-	const path = join(__dirname, "../../../../", "hash-key");
-	let key = "changeme";
-	if (fs.existsSync(path)) {
-		const keyFromFile = fs.readFileSync(path);
-		key = keyFromFile.length > 0 ? keyFromFile.toString() : key;
-	}
-	return key;
+	// const path = join(__dirname, "../../../../", "hash-key");
+	// let key = "changeme";
+	// if (fs.existsSync(path)) {
+	// 	const keyFromFile = fs.readFileSync(path);
+	// 	key = keyFromFile.length > 0 ? keyFromFile.toString() : key;
+	// }
+	// return key;
+	return process.env.HASH_KEY || "changeme";
 }

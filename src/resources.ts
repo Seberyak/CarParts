@@ -14,7 +14,6 @@ import { JwtStrategy } from "./core/services/auth/jwt.strategy";
 import { JwtAuthGuard } from "./core/services/auth/jwt-auth.guard";
 import { AuthService } from "./core/services/auth";
 import { PartsRatingService } from "./core/services/parts-rating";
-import { ConfigModule } from "@nestjs/config";
 import { TypegooseModule } from "nestjs-typegoose";
 import { User } from "./core/models/typegoose/users";
 import { File } from "./core/models/typegoose/files";
@@ -29,6 +28,7 @@ import { CustomMiddleware } from "./api/middlewares";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SqlArticlesController } from "./api/sql-articles/controller";
 import { SqlArticlesService } from "./core/services/sql-articles";
+require("dotenv").config();
 
 export const Resources = {
 	Controllers: [
@@ -56,7 +56,7 @@ export const Resources = {
 		SqlArticlesService,
 	],
 	Imports: [
-		ConfigModule.forRoot(),
+		// ConfigModule.forRoot(),
 		TypegooseModule.forRoot("mongodb://localhost:27017/nest", {
 			useNewUrlParser: true,
 		}),
@@ -73,13 +73,23 @@ export const Resources = {
 		TypeOrmModule.forRoot({
 			type: "mysql",
 			host: "localhost",
-			port: 3306,
+			port: 3306, //toInt(process.env.MYSQL_PORT) || 3306,
 			username: process.env.MYSQL_USER || "root",
 			password: process.env.MYSQL_PASSWORD || "password",
-			database: process.env.MYSQL_DATABASE || "DT2019Q2",
+			database: process.env.MYSQL_DATABASE || "dt2019q2",
 			entities: [],
 			synchronize: true,
 		}),
 		ImagesModule,
 	],
 };
+
+function toInt(args: string): number {
+	console.log("==================================");
+	console.log(args);
+	let res = -1;
+	try {
+		res = parseInt(args);
+	} catch {}
+	return res;
+}
