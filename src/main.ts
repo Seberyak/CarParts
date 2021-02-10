@@ -1,25 +1,20 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ErrorFilter } from "./api/error-filter";
-import * as ngrok from "ngrok";
+
+import { NgrokService } from "./core/services/ngrok";
+require("dotenv").config();
 
 async function bootstrap() {
+	const apiPort = parseInt(process.env.API_PORT) || 3000;
+
 	const app = await NestFactory.create(AppModule);
 	app.useGlobalFilters(new ErrorFilter());
-	await app.listen(3000);
+	await app.listen(apiPort);
 	app.enableCors();
-
-	const ngrokToken = "1nyQB5spBP83uq8E3Tb9PjheROw_4D4KgGhi48h6yG5hK1BeG";
-	await ngrok.authtoken(ngrokToken);
-	await ngrok.connect({ authtoken: ngrokToken });
-	const url = await ngrok.connect({
-		proto: "http", // http|tcp|tls, defaults to http
-		addr: 3000, // port or network address, defaults to 80
-		subdomain: "car-parts", // reserved tunnel name https://alex.ngrok.io
-		authtoken: ngrokToken, // your authtoken from ngrok.com
-		region: "eu", // one of ngrok regions (us, eu, au, ap, sa, jp, in), defaults to us
-	});
-	console.log(url);
+	await new NgrokService().start();
+	console.log(`=======================Api started=======================`);
+	console.log(`localhost:${apiPort}`);
 }
 
 bootstrap();

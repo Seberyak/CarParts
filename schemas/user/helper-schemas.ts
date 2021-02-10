@@ -42,7 +42,7 @@ export const UserSchema = BasicDocumentSchema.keys({
 		.allow(null)
 		.required(),
 	type: Joi.objectId().required(),
-	firebaseMetadata: FirebaseMetadataSchema,
+	firebaseMetadata: FirebaseMetadataSchema.allow(null),
 });
 
 export interface IUser extends IBasicDocument {
@@ -52,5 +52,5 @@ export interface IUser extends IBasicDocument {
 	email: string | null;
 	password: string | null;
 	type: ObjectId;
-	firebaseMetadata: IFirebaseMetadata;
+	firebaseMetadata: IFirebaseMetadata | null;
 }

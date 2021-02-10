@@ -23,24 +23,49 @@ import {
 	IPartRatingModel,
 	PartRating,
 } from "../../models/typegoose/parts-rating";
+import { IPart } from "../../../../schemas/parts/helper-schemas";
+import { SqlArticlesHelper } from "../sql-articles/helpers";
+import { Connection } from "typeorm";
+import { PartTags } from "./helpers/tags";
 
 @Injectable()
 export class PartsService {
+	private readonly Helper: SqlArticlesHelper;
+	private readonly manager;
 	constructor(
 		@InjectModel(Part)
 		private readonly _PartModel: IPartModel,
 
 		@InjectModel(PartRating)
-		private readonly _PartRatingModel: IPartRatingModel
-	) {}
+		private readonly _PartRatingModel: IPartRatingModel,
+		private readonly _Connection: Connection
+	) {
+		this.manager = this._Connection.manager;
+		this.Helper = new SqlArticlesHelper(this.manager);
+	}
 
 	public async create(args: IAPOSTPart, user: IUser): Promise<IRPOSTPart> {
-		const part = new this._PartModel({
-			...args,
+		const {} = args;
+		const dataToSave: Omit<IPart, "_id" | "updatedAt" | "createdAt"> = {
+			title: args.title,
+			tags: await new PartTags(args, this._Connection).get(),
 			author: user._id,
-			quantity: args.quantity ?? 1,
+			barCode: args.barCode,
+			description: args.description,
+			images: args.images,
+			manufacturerType: args.manufacturerType,
+			modificationIds: args.modificationIds,
+			oem: args.oem || "no oem",
+			price: args.price,
+			quantity: args.quantity,
 			rating: 0,
-		});
+			productId: args.productId,
+			supplier: undefined,
+		};
+
+		if (1 < 2) return dataToSave as IRPOSTPart;
+
+		const part = new this._PartModel(dataToSave);
 		return part.save();
 	}
 

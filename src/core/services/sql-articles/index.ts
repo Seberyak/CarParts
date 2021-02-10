@@ -3,32 +3,41 @@ import { Injectable } from "@nestjs/common";
 import { Connection, EntityManager } from "typeorm";
 import {
 	IAGETAutocompleteByOem,
+	IAGETCarManufacturers,
 	IAGETCarModels,
 	IAGETCarModifications,
-	IAGETCarManufacturers,
 	IAGETPartCategories,
-	IAGETSectionParts,
-	IArticleLinks,
+	IAGETPartsByProductId,
+	IAGETProductsByNode,
 	ICarModificationsQueryData,
-	IRCarsTree,
+	IRGETCarManufacturers,
 	IRGETCarModels,
 	IRGETCarModifications,
-	IRGETCarManufacturers,
 	IRGETPartCategories,
-	IRGETSectionParts,
-	ICarsTreeRawData,
+	IRGETPartsByProductId,
+	IRGETProductsByNode,
 } from "../../../../schemas/sql-articles/validators";
 import { ECarManufacturerTypes } from "../../../../schemas/sql-articles/helper-schemas";
 import { SqlArticlesHelper } from "./helpers";
 import { assertResourceExist } from "../../utils/asserts";
+import { AutoCompleteByOem } from "./helpers/auto-complete-by-oem";
+
+type IProductsTable = {
+	supplier: string;
+	modificationId: number;
+	supplierId: number;
+	productId: number;
+	description: string;
+}[];
 
 @Injectable()
 export class SqlArticlesService {
-	private manager: EntityManager;
+	private readonly manager: EntityManager;
 	private Helper;
+
 	constructor(private readonly _Connection: Connection) {
 		this.manager = this._Connection.manager;
-		this.Helper = new SqlArticlesHelper();
+		this.Helper = new SqlArticlesHelper(this.manager);
 	}
 
 	public getCarManufacturers(
@@ -141,15 +150,15 @@ export class SqlArticlesService {
 	}
 
 	// eslint-disable-next-line max-lines-per-function
-	public async getPartsBySection(
-		args: IAGETSectionParts
-	): Promise<IRGETSectionParts> {
-		const getQuery = (args: IAGETSectionParts): string => {
-			const { modificationId, sectionId, type } = args;
+	public async getPartsByProductId(
+		args: IAGETPartsByProductId
+	): Promise<IRGETPartsByProductId> {
+		const getQuery = (args1: IAGETPartsByProductId): string => {
+			const { modificationId, productId, type } = args1;
 			switch (type) {
 				case ECarManufacturerTypes.passenger:
-					return `SELECT al.datasupplierarticlenumber part_number,
-				s.description supplier_name, prd.description product_name
+					return `SELECT al.datasupplierarticlenumber partNumber,
+				s.description supplierName, prd.description productName
 				FROM article_links al
 				JOIN passanger_car_pds pds on al.supplierid = pds.supplierid
 				JOIN suppliers s on s.id = al.supplierid
@@ -157,13 +166,13 @@ export class SqlArticlesService {
 				WHERE al.productid = pds.productid
 				AND al.linkageid = pds.passangercarid
 				AND al.linkageid = ${modificationId}
-				AND pds.nodeid = ${sectionId}
+				AND pds.productid = ${productId}
 				AND al.linkagetypeid = 2
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
 				case ECarManufacturerTypes.commercial:
-					return `SELECT al.datasupplierarticlenumber part_number,
-				s.description supplier_name, prd.description product_name
+					return `SELECT al.datasupplierarticlenumber partNumber,
+				s.description supplierName, prd.description productName
 				FROM article_links al
 				JOIN commercial_vehicle_pds pds on al.supplierid = pds.supplierid
 				JOIN suppliers s on s.id = al.supplierid
@@ -171,13 +180,13 @@ export class SqlArticlesService {
 				WHERE al.productid = pds.productid
 				AND al.linkageid = pds.commertialvehicleid
 				AND al.linkageid = ${modificationId}
-				AND pds.nodeid = ${sectionId}
+				AND pds.productid = ${productId}
 				AND al.linkagetypeid = 16
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
 				case ECarManufacturerTypes.motorbike:
-					return `SELECT al.datasupplierarticlenumber part_number,
-				s.description supplier_name, prd.description product_name
+					return `SELECT al.datasupplierarticlenumber partNumber,
+				s.description supplierName, prd.description productName
 				FROM article_links al
 				JOIN motorbike_pds pds on al.supplierid = pds.supplierid
 				JOIN suppliers s on s.id = al.supplierid
@@ -185,13 +194,13 @@ export class SqlArticlesService {
 				WHERE al.productid = pds.productid
 				AND al.linkageid = pds.motorbikeid
 				AND al.linkageid = ${modificationId}
-				AND pds.nodeid = ${sectionId}
+				AND pds.productid = ${productId}
 				AND al.linkagetypeid = 777
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
 				case ECarManufacturerTypes.engine:
-					return `SELECT pds.engineid, al.datasupplierarticlenumber part_number,
-				prd.description product_name, s.description supplier_name
+					return `SELECT pds.engineid, al.datasupplierarticlenumber partNumber,
+				prd.description productName, s.description supplierName
 				FROM article_links al
 				JOIN engine_pds pds on al.supplierid = pds.supplierid
 				JOIN suppliers s on s.id = al.supplierid
@@ -199,13 +208,13 @@ export class SqlArticlesService {
 				WHERE al.productid = pds.productid
 				AND al.linkageid = pds.engineid
 				AND al.linkageid = ${modificationId}
-				AND pds.nodeid = ${sectionId}
+				AND pds.productid = ${productId}
 				AND al.linkagetypeid = 14
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
 				case ECarManufacturerTypes.axle:
-					return `SELECT pds.axleid, al.datasupplierarticlenumber part_number,
-				prd.description product_name, s.description supplier_name
+					return `SELECT pds.axleid, al.datasupplierarticlenumber partNumber,
+				prd.description productName, s.description supplierName
 				FROM article_links al
 				JOIN axle_pds pds on al.supplierid = pds.supplierid
 				JOIN suppliers s on s.id = al.supplierid
@@ -213,7 +222,7 @@ export class SqlArticlesService {
 				WHERE al.productid = pds.productid
 				AND al.linkageid = pds.axleid
 				AND al.linkageid = ${modificationId}
-				AND pds.nodeid = ${sectionId}
+				AND pds.productid = ${productId}
 				AND al.linkagetypeid = 19
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 			}
@@ -225,60 +234,50 @@ export class SqlArticlesService {
 	public async getAutoCompleteByOem(
 		args: IAGETAutocompleteByOem
 	): Promise<any> {
-		let isBrand = true;
-		const articleLinks: IArticleLinks[] = await this.manager.query(
-			`select * from article_links where datasupplierarticlenumber = '${args.oem}';`
-		);
-		if (!articleLinks.length) {
-			assertResourceExist(undefined, "part");
-			isBrand = false;
-			return {
-				isBrand,
-				originalOem: "aq iwereba originali oem",
-				message: "This part is not original",
-			};
-		}
-		const groupedByLinkageType = this.Helper.groupByLinkageType(
-			articleLinks
-		);
-		const carManufacturerType: ECarManufacturerTypes = this.Helper.getCarManufacturerTypeFromGroupedArticleLinks(
-			groupedByLinkageType
-		);
-		const typedArticleLinks = groupedByLinkageType[carManufacturerType];
-		const modificationIds = typedArticleLinks.map(el => el.linkageid);
-		return this.getCarsTreeByModificationIds(
-			modificationIds,
-			carManufacturerType
-		);
-	}
-	// TODO add queries to another types
-	private async getCarsTreeByModificationIds(
-		ids: number[],
-		type: ECarManufacturerTypes
-	): Promise<any> {
-		let query: string;
+		const helper = new AutoCompleteByOem(args);
 
-		switch (type) {
-			case ECarManufacturerTypes.passenger:
-				query = `select distinct mfct.id manufacturerId, mfct.description manufacturer, m.id modelId, m.description  model,
-       pcars.id modificationId ,pcars.description modification, pcars.constructioninterval from passanger_cars pcars
-       join models m on pcars.modelid=m.id join manufacturers mfct on m.manufacturerid=mfct.id
-        where pcars.id in ${this.Helper.arrayToSqlQueryList(ids)}`;
-				break;
-			case ECarManufacturerTypes.motorbike:
-				break;
-			case ECarManufacturerTypes.engine:
-				break;
-			case ECarManufacturerTypes.commercial:
-				break;
-			case ECarManufacturerTypes.axle:
-				break;
+		const nonOriginalsQuery = helper.getNonOriginalsQuery();
+		let res: IProductsTable = await this.manager.query(nonOriginalsQuery);
+		if (!res.length) {
+			const originalsQuery = helper.getOriginalsQuery();
+			res = await this.manager.query(originalsQuery);
+			if (!res.length) assertResourceExist(undefined, "part");
 		}
-		const data: ICarsTreeRawData = await this.manager.query(query);
-		const res: IRCarsTree = this.Helper.createCarsTreeByQueryData(data);
-		return { cars: res };
+		const productsTable = res;
+
+		return helper.normalizeTableResponse(productsTable);
+
+		/*
+    const articleLinks: IArticleLinks[] = await this.manager.query(
+      nonOriginalsQuery
+    );
+    if (!articleLinks.length) {
+      assertResourceExist(undefined, "part");
+      isBrand = false;
+      return {
+        isBrand,
+        originalOem: "aq iwereba originali oem",
+        message: "This part is not original",
+      };
+    }
+
+    const modificationIds = articleLinks.map(el => el.linkageid);
+
+    if (1 < 2) {
+      return {
+        modificationId:
+          modificationIds[getRandomInt(modificationIds.length)],
+        len: modificationIds.length,
+      };
+    }
+
+    return await this.Helper.getCarsTreeByModificationIds(
+      modificationIds,
+      args.type
+    );*/
 	}
 
+	// TODO add queries to engine type
 	public async getModelsByModificationIds(args: {
 		type: ECarManufacturerTypes;
 		ids: number[];
@@ -355,6 +354,71 @@ export class SqlArticlesService {
 				break;
 		}
 		query += "AND id in " + this.Helper.arrayToSqlQueryList(ids);
+
+		return this.manager.query(query);
+	}
+
+	public async getProductsByNode(
+		args: IAGETProductsByNode
+	): Promise<IRGETProductsByNode> {
+		const { carManufacturerType, modificationId, nodeId } = args;
+
+		const getTable = (
+			type: ECarManufacturerTypes
+		): {
+			pds: string;
+			prd: string;
+			modificationColumn: string;
+			tree: string;
+		} => {
+			switch (type) {
+				case ECarManufacturerTypes.axle:
+					return {
+						pds: "axle_pds",
+						prd: "axle_prd",
+						modificationColumn: "axleid",
+						tree: "axle_trees",
+					};
+				case ECarManufacturerTypes.commercial:
+					return {
+						pds: "commercial_vehicle_pds",
+						prd: "commercial_vehicle_prd",
+						modificationColumn: "commertialvehicleid",
+						tree: "commercial_vehicle_trees",
+					};
+				case ECarManufacturerTypes.engine:
+					return {
+						pds: "engine_pds",
+						prd: "engine_prd",
+						modificationColumn: "engineid",
+						tree: "engine_trees",
+					};
+				case ECarManufacturerTypes.motorbike:
+					return {
+						pds: "motorbike_pds",
+						prd: "motorbike_prd",
+						modificationColumn: "motorbikeid",
+						tree: "motorbike_trees",
+					};
+				case ECarManufacturerTypes.passenger:
+					return {
+						pds: "passanger_car_pds",
+						prd: "passanger_car_prd",
+						modificationColumn: "passangercarid",
+						tree: "passanger_car_trees",
+					};
+			}
+		};
+
+		const { modificationColumn, prd, pds, tree } = getTable(
+			carManufacturerType
+		);
+		const query = `select distinct tree.id nodeId, prd.id productId, prd.description 
+		from ${tree} tree
+		join ${pds} pds on pds.nodeid = tree.id and pds.${modificationColumn} = tree.${modificationColumn}
+		join ${prd} prd on pds.productid = prd.id
+		where tree.${modificationColumn} = ${modificationId}
+		and tree.id = ${nodeId}`;
 
 		return this.manager.query(query);
 	}

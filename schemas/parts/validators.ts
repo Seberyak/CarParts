@@ -17,15 +17,20 @@ import {
 
 export const APOSTPartSchema = PartSchema.keys({
 	...InsertStripKeysSchema,
+	oem: Joi.string().optional(),
 	author: Joi.any().strip(),
 	rating: Joi.any().strip(),
-	quantity: Joi.number(),
+	tags: Joi.array()
+		.items(Joi.string())
+		.optional(),
 });
 
 export interface IAPOSTPart
-	extends Omit<IPart, toInsertKeys | "author" | "rating" | "quantity"> {
-	quantity?: number;
+	extends Omit<IPart, toInsertKeys | "author" | "rating" | "tags" | "oem"> {
+	oem: string | undefined;
+	tags: string[] | undefined;
 }
+
 export const RPOSTPartSchema = PartSchema;
 
 export type IRPOSTPart = IPart;

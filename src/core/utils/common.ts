@@ -4,6 +4,7 @@ import { getKeyFromFile } from "./crypt";
 import { UserTypes } from "../../../schemas/user/user-types";
 import { IFirebaseMetadata } from "../../../schemas/user/helper-schemas";
 import { ObjectId } from "bson";
+import { alphabets } from "./alphabets";
 
 ///
 
@@ -69,4 +70,45 @@ export function getUserFromToken(accessToken: string): IDecodedUser {
 	const keys = Object.keys(a);
 
 	return <IDecodedUser>undefinedToNullProperties(decodedUser, keys);
+}
+
+export function parseWordsFromString(args: string | string[]): string[] {
+	if (Array.isArray(args)) {
+		args = args.join();
+	}
+	const myAlphabet = [
+		...alphabets.nums,
+		...alphabets.en,
+		...alphabets.ge,
+		...alphabets.ru,
+	];
+
+	let substr = "";
+	const words: string[] = [];
+	for (const el of args) {
+		if (!myAlphabet.includes(el)) {
+			if (!!substr.length) words.push(substr);
+			substr = "";
+		} else substr += el;
+	}
+	if (substr.length > 0) words.push(substr);
+	return words;
+}
+
+export function getRandomInt(max: number, min = 0): number {
+	if (min > max) [min, max] = [max, min];
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min) + min);
+}
+
+export function arrayToSqlQueryList(arr: string[] | number[]): string {
+	let res = `(`;
+	arr.forEach(el => {
+		if (typeof el === "number") el = el.toString();
+		res += `${el}, `;
+	});
+	res = res.slice(0, res.length - 2);
+	res += ")";
+	return res;
 }

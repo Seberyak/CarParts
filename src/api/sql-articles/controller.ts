@@ -8,18 +8,21 @@ import {
 	AGETCarModificationsSchema,
 	AGETCarManufacturersSchema,
 	AGETPartCategoriesSchema,
-	AGETSectionPartsSchema,
 	IAGETAutocompleteByOem,
 	IAGETCarModels,
 	IAGETCarModifications,
 	IAGETCarManufacturers,
 	IAGETPartCategories,
-	IAGETSectionParts,
+	IAGETPartsByProductId,
 	IRGETCarModels,
 	IRGETCarModifications,
 	IRGETCarManufacturers,
 	IRGETPartCategories,
-	IRGETSectionParts,
+	AGETProductsByNodeSchema,
+	IAGETProductsByNode,
+	IRGETProductsByNode,
+	AGETPartsByProductIdSchema,
+	IRGETPartsByProductId,
 } from "../../../schemas/sql-articles/validators";
 
 const controller = "api/sql-articles";
@@ -56,11 +59,11 @@ export class SqlArticlesController {
 		return this._SqlArticlesService.getPartCategories(args);
 	}
 
-	@Get(`${controller}/parts-by-section`)
+	@Get(`${controller}/parts-by-product-id`)
 	async getPartsBySection(
-		@wValidatedArg(AGETSectionPartsSchema) args: IAGETSectionParts
-	): Promise<IRGETSectionParts> {
-		return this._SqlArticlesService.getPartsBySection(args);
+		@wValidatedArg(AGETPartsByProductIdSchema) args: IAGETPartsByProductId
+	): Promise<IRGETPartsByProductId> {
+		return this._SqlArticlesService.getPartsByProductId(args);
 	}
 	@Get(`${controller}/autocomplete-by-oem`)
 	async getAutoCompleteByOem(
@@ -68,5 +71,12 @@ export class SqlArticlesController {
 		args: IAGETAutocompleteByOem
 	): Promise<any> {
 		return this._SqlArticlesService.getAutoCompleteByOem(args);
+	}
+
+	@Get(`${controller}/products-by-node`)
+	async getProductsByNode(
+		@wValidatedArg(AGETProductsByNodeSchema) args: IAGETProductsByNode
+	): Promise<IRGETProductsByNode> {
+		return this._SqlArticlesService.getProductsByNode(args);
 	}
 }

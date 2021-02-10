@@ -5,22 +5,17 @@ import { getManyDocsFunc } from "./abstract";
 import { IRPaginated } from "../../../../schemas/helper-schemas";
 import { IAGETManyPart } from "../../../../schemas/parts/validators";
 
+//TODO index props...
 @modelOptions(getTypegooseOptions("parts"))
 export class Part implements Omit<IPart, "_id"> {
 	@Prop()
 	author: IPart["author"];
 
 	@Prop()
-	category: IPart["category"];
-
-	@Prop()
 	description: IPart["description"];
 
 	@Prop()
 	images: IPart["images"];
-
-	@Prop()
-	manufacturer: IPart["manufacturer"];
 
 	@Prop()
 	oem: IPart["oem"];
@@ -39,6 +34,21 @@ export class Part implements Omit<IPart, "_id"> {
 
 	@Prop()
 	barCode: IPart["barCode"];
+
+	@Prop()
+	tags: string[];
+
+	@Prop()
+	manufacturerType: IPart["manufacturerType"];
+
+	@Prop()
+	modificationIds: IPart["modificationIds"];
+
+	@Prop({ index: true })
+	productId: IPart["productId"];
+
+	@Prop()
+	supplier: IPart["supplier"];
 
 	@Prop()
 	createdAt: Date;

@@ -48,6 +48,7 @@
     "multer-gridfs-storage": "^4.2.0",
     "mysql": "^2.18.1",
     "nestjs-typegoose": "^7.1.38",
+    "ngrok": "^3.4.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
