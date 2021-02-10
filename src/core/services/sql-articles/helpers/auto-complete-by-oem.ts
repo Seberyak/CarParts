@@ -9,12 +9,12 @@ type IProductsTable = {
 	modificationId: number;
 	supplierId: number;
 	productId: number;
-	description: string;
+	title: string;
 }[];
 
 interface INormalizedProducts {
 	productId: number;
-	description: string;
+	title: string;
 	suppliers: { id: number; name: string }[];
 	modificationIds: number[];
 }
@@ -32,7 +32,7 @@ export class AutoCompleteByOem {
 		const prd = this.getPrdTable();
 
 		return `select distinct s.description supplier,s.id supplierId, al.linkageid modificationId,
-		prd.id productId ,prd.description  from article_oe a
+		prd.id productId ,prd.description  title from article_oe a
 		join suppliers s on a.supplierid=s.id
 		join article_links al on al.datasupplierarticlenumber=a.datasupplierarticlenumber
 		and al.supplierid=a.supplierid
@@ -45,7 +45,7 @@ export class AutoCompleteByOem {
 		const prd = this.getPrdTable();
 
 		return `select distinct s.description supplier,s.id supplierId,al.linkageid modificationId,
-		prd.id productId, prd.description from article_links al
+		prd.id productId, prd.description title from article_links al
 		join suppliers s on al.supplierid=s.id
 		join ${prd} prd on prd.id = al.productid
 		where al.datasupplierarticlenumber = '${this.oem}' and 
@@ -62,8 +62,8 @@ export class AutoCompleteByOem {
 			}
 		);
 		//TODO check this...
-		const { productId, description } = data[0];
-		return { modificationIds, suppliers, productId, description };
+		const { productId, title } = data[0];
+		return { modificationIds, suppliers, productId, title };
 	}
 
 	private getPrdTable(): string {

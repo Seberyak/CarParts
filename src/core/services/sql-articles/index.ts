@@ -27,7 +27,7 @@ type IProductsTable = {
 	modificationId: number;
 	supplierId: number;
 	productId: number;
-	description: string;
+	title: string;
 }[];
 
 @Injectable()
@@ -130,19 +130,19 @@ export class SqlArticlesService {
 			const parentId = partCategoriesArgs.parentId ?? 0;
 			switch (type) {
 				case ECarManufacturerTypes.passenger:
-					return `select id,description from passanger_car_trees where passangercarid=${modificationId} and parentid = ${parentId}`;
+					return `select distinct id,description from passanger_car_trees where passangercarid=${modificationId} and parentid = ${parentId}`;
 
 				case ECarManufacturerTypes.commercial:
-					return `select id,description from commercial_vehicle_trees where commercialvehicleid=${modificationId} and parentid = ${parentId}`;
+					return `select distinct id,description from commercial_vehicle_trees where commercialvehicleid=${modificationId} and parentid = ${parentId}`;
 
 				case ECarManufacturerTypes.motorbike:
-					return `select id,description from motorbike_trees where motorbikeid=${modificationId} and parentid = ${parentId}`;
+					return `select distinct id,description from motorbike_trees where motorbikeid=${modificationId} and parentid = ${parentId}`;
 
 				case ECarManufacturerTypes.engine:
-					return `select id,description from engine_trees where engineid=${modificationId} and parentid = ${parentId}`;
+					return `select distinct id,description from engine_trees where engineid=${modificationId} and parentid = ${parentId}`;
 
 				case ECarManufacturerTypes.axle:
-					return `select id,description from axle_trees where axleid=${modificationId} and parentid = ${parentId}`;
+					return `select distinct id,description from axle_trees where axleid=${modificationId} and parentid = ${parentId}`;
 			}
 		};
 		const query = getQuery(args);
@@ -157,7 +157,7 @@ export class SqlArticlesService {
 			const { modificationId, productId, type } = args1;
 			switch (type) {
 				case ECarManufacturerTypes.passenger:
-					return `SELECT al.datasupplierarticlenumber partNumber,
+					return `SELECT distinct al.datasupplierarticlenumber partNumber,
 				s.description supplierName, prd.description productName
 				FROM article_links al
 				JOIN passanger_car_pds pds on al.supplierid = pds.supplierid
@@ -171,7 +171,7 @@ export class SqlArticlesService {
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
 				case ECarManufacturerTypes.commercial:
-					return `SELECT al.datasupplierarticlenumber partNumber,
+					return `SELECT distinct al.datasupplierarticlenumber partNumber,
 				s.description supplierName, prd.description productName
 				FROM article_links al
 				JOIN commercial_vehicle_pds pds on al.supplierid = pds.supplierid
@@ -185,7 +185,7 @@ export class SqlArticlesService {
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
 				case ECarManufacturerTypes.motorbike:
-					return `SELECT al.datasupplierarticlenumber partNumber,
+					return `SELECT distinct al.datasupplierarticlenumber partNumber,
 				s.description supplierName, prd.description productName
 				FROM article_links al
 				JOIN motorbike_pds pds on al.supplierid = pds.supplierid
@@ -199,7 +199,7 @@ export class SqlArticlesService {
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
 				case ECarManufacturerTypes.engine:
-					return `SELECT pds.engineid, al.datasupplierarticlenumber partNumber,
+					return `SELECT distinct pds.engineid, al.datasupplierarticlenumber partNumber,
 				prd.description productName, s.description supplierName
 				FROM article_links al
 				JOIN engine_pds pds on al.supplierid = pds.supplierid
@@ -213,7 +213,7 @@ export class SqlArticlesService {
 				ORDER BY s.description, al.datasupplierarticlenumber`;
 
 				case ECarManufacturerTypes.axle:
-					return `SELECT pds.axleid, al.datasupplierarticlenumber partNumber,
+					return `SELECT distinct pds.axleid, al.datasupplierarticlenumber partNumber,
 				prd.description productName, s.description supplierName
 				FROM article_links al
 				JOIN axle_pds pds on al.supplierid = pds.supplierid
@@ -361,7 +361,7 @@ export class SqlArticlesService {
 	public async getProductsByNode(
 		args: IAGETProductsByNode
 	): Promise<IRGETProductsByNode> {
-		const { carManufacturerType, modificationId, nodeId } = args;
+		const { type, modificationId, nodeId } = args;
 
 		const getTable = (
 			type: ECarManufacturerTypes
@@ -410,9 +410,7 @@ export class SqlArticlesService {
 			}
 		};
 
-		const { modificationColumn, prd, pds, tree } = getTable(
-			carManufacturerType
-		);
+		const { modificationColumn, prd, pds, tree } = getTable(type);
 		const query = `select distinct tree.id nodeId, prd.id productId, prd.description 
 		from ${tree} tree
 		join ${pds} pds on pds.nodeid = tree.id and pds.${modificationColumn} = tree.${modificationColumn}

@@ -198,13 +198,13 @@ export interface IAGETAutocompleteByOem {
 export const AGETProductsByNodeSchema = Joi.object({
 	modificationId: Joi.number().required(),
 	nodeId: Joi.number().required(),
-	carManufacturerType: CarManufacturersTypesSchema.required(),
+	type: CarManufacturersTypesSchema.required(),
 });
 
 export interface IAGETProductsByNode {
 	modificationId: number;
 	nodeId: number;
-	carManufacturerType: ECarManufacturerTypes;
+	type: ECarManufacturerTypes;
 }
 export const RGETProductsByNodeSchema = Joi.array().items(
 	Joi.object({

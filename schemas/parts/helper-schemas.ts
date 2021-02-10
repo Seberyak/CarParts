@@ -8,9 +8,6 @@ import {
 
 export const PartSchema = BasicDocumentSchema.keys({
 	title: Joi.string().required(),
-	description: Joi.string()
-		.allow("", null)
-		.required(),
 	author: Joi.objectId().required(),
 	price: Joi.number().required(),
 	oem: Joi.string().required(),
@@ -29,9 +26,10 @@ export const PartSchema = BasicDocumentSchema.keys({
 		.items(Joi.number())
 		.min(1)
 		.required(),
-	barCode: Joi.string(),
 	manufacturerType: CarManufacturersTypesSchema,
-	productId: Joi.number(),
+	productId: Joi.number().required(),
+	barCode: Joi.string(),
+	description: Joi.string().allow(""),
 	supplier: Joi.object({
 		id: Joi.number().required(),
 		name: Joi.string().required(),
@@ -40,7 +38,6 @@ export const PartSchema = BasicDocumentSchema.keys({
 
 export interface IPart extends IBasicDocument {
 	title: string;
-	description: string | null;
 	author: ObjectId;
 	price: number;
 	oem: string;
@@ -49,8 +46,9 @@ export interface IPart extends IBasicDocument {
 	rating: number;
 	tags: string[];
 	modificationIds: number[];
-	barCode: string | undefined;
 	manufacturerType: ECarManufacturerTypes;
-	productId: number | undefined;
+	productId: number;
+	barCode: string | undefined;
+	description: string | undefined;
 	supplier: { id: number; name: string } | undefined;
 }
