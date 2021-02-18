@@ -55,11 +55,13 @@ export interface IArgsManyId {
 export const APaginatedSchema = {
 	from: Joi.number().required(),
 	to: Joi.number().required(),
+	_ids: Joi.array().items(Joi.objectId()),
 };
 
 export interface IAPaginated {
 	from: number;
 	to: number;
+	_ids?: ObjectId[];
 }
 
 export const RPaginatedSchema = (TSchema: JoiSchema): JoiSchema =>

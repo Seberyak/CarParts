@@ -53,6 +53,25 @@ export class AutoCompleteByOem {
 	}
 
 	public normalizeTableResponse(data: IProductsTable): INormalizedProducts {
+		const groupByProductId = (args: IProductsTable) => {
+			let res: Record<number, INormalizedProducts>;
+			args.forEach(el => {
+				if (!res.hasOwnProperty(el.productId)) {
+					res[el.productId] = {
+						suppliers: [],
+						modificationIds: [],
+						productId: el.productId,
+						title: el.title,
+					};
+				}
+				res[el.productId].modificationIds.push(el.modificationId);
+				res[el.productId].suppliers.push({
+					id: el.supplierId,
+					name: el.supplier,
+				});
+			});
+		};
+
 		const modificationIds = [...new Set(data.map(el => el.modificationId))];
 		const supplierIds = [...new Set<number>(data.map(el => el.supplierId))];
 		const suppliers: { id: number; name: string }[] = supplierIds.map(
@@ -63,6 +82,8 @@ export class AutoCompleteByOem {
 		);
 		//TODO check this...
 		const { productId, title } = data[0];
+		const productIdsSet = new Set(data.map(el => el.productId));
+		console.log(...productIdsSet);
 		return { modificationIds, suppliers, productId, title };
 	}
 

@@ -5,16 +5,19 @@ import {
 	ADELETEPartSchema,
 	AGETManyPartSchema,
 	AGETPartSchema,
+	AGETSearchPartsSchema,
 	APOSTPartSchema,
 	APUTPartSchema,
 	IADELETEPart,
 	IAGETManyPart,
 	IAGETPart,
+	IAGETSearchParts,
 	IAPOSTPart,
 	IAPUTPart,
 	IRDELETEPart,
 	IRGETManyPart,
 	IRGETPart,
+	IRGETSearchParts,
 	IRPOSTPart,
 	IRPUTPart,
 } from "../../../schemas/parts/validators";
@@ -76,5 +79,12 @@ export class PartsController {
 		@wUser() user: IUser
 	): Promise<IRDELETEPart> {
 		return this._PartsService.delete(args, user);
+	}
+
+	@Get(`${controller}/search-parts`)
+	async searchParts(
+		@wValidatedArg(AGETSearchPartsSchema) args: IAGETSearchParts
+	): Promise<IRGETSearchParts> {
+		return this._PartsService.searchParts(args);
 	}
 }

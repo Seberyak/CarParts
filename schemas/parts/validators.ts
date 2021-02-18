@@ -12,6 +12,8 @@ import {
 	toUpdateKeys,
 	UpdateStripKeysSchema,
 } from "../helper-schemas";
+import { CarManufacturersTypesSchema } from "../sql-articles/helper-schemas";
+import { ObjectId } from "bson";
 
 ///---------------POST part
 
@@ -77,3 +79,34 @@ export type IADELETEPart = IArgsId;
 export const RDELETEPartSchema = Joi.any();
 
 export type IRDELETEPart = unknown;
+
+///---------------GET Search part
+
+export const AGETSearchPartsSchema = Joi.object({
+	manufacturerType: CarManufacturersTypesSchema,
+	modificationIds: Joi.array().items(Joi.number()),
+	productId: Joi.number(),
+	barCode: Joi.string(),
+	price: Joi.object({
+		min: Joi.number()
+			.min(0)
+			.required(),
+		max: Joi.number()
+			.min(0)
+			.required(),
+	}),
+	searchableText: Joi.string(),
+});
+
+export interface IAGETSearchParts {
+	manufacturerType?: IPart["manufacturerType"];
+	modificationIds?: IPart["modificationIds"];
+	productId?: IPart["productId"];
+	barCode?: IPart["barCode"];
+	price?: { min: number; max: number };
+	searchableText?: string;
+}
+
+export const RGETSearchPartsSchema = RGETManyPartSchema;
+
+export type IRGETSearchParts = IRGETManyPart;

@@ -186,12 +186,38 @@ export type IRCarsTree = Record<string, ICarsTreeManufacturerLevel>;
 export const AGETAutocompleteByOemSchema = Joi.object({
 	oem: Joi.string().required(),
 	type: CarManufacturersTypesSchema.required(),
+	productId: Joi.number(),
 });
 
 export interface IAGETAutocompleteByOem {
 	oem: string;
 	type: ECarManufacturerTypes;
+	productId?: number;
 }
+export const RGETAutocompleteByOemSchema = Joi.array().items(
+	Joi.object({
+		productId: Joi.number().required(),
+		title: Joi.string().required(),
+		suppliers: Joi.array()
+			.items(
+				Joi.object({
+					id: Joi.number().required(),
+					name: Joi.string().required(),
+				})
+			)
+			.required(),
+		modificationIds: Joi.array()
+			.items(Joi.number())
+			.required(),
+	})
+);
+
+export type IRGETAutocompleteByOem = {
+	productId: number;
+	title: string;
+	suppliers: { id: number; name: string }[];
+	modificationIds: number[];
+}[];
 
 ///---------------GET Products By Node
 

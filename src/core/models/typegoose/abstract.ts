@@ -11,13 +11,18 @@ export async function getManyDocsFunc<T>(
 	args: IAPaginated,
 	model: Model<any>
 ): Promise<IRPaginated<T>> {
+	const { _ids } = args;
+	let query = {};
+	if (!!args._ids && args._ids.length > 0) {
+		query = { _id: { $in: _ids } };
+	}
 	const [docs, numDocs] = await Promise.all([
 		model
-			.find()
+			.find(query)
 			.sort({ createdAt: -1 })
 			.skip(args.from)
 			.limit(Math.max(args.to - args.from, 0)),
-		model.countDocuments(),
+		model.countDocuments(query),
 	]);
 
 	return { docs, numDocs };

@@ -24,7 +24,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { JwtModule } from "@nestjs/jwt";
 import { jwtConstants } from "./core/services/auth/jwt.constants";
 import { ImagesModule } from "./api/files/images/module";
-import { CustomMiddleware } from "./api/middlewares";
+import { RequestsLoggerMiddleware } from "./api/middlewares";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SqlArticlesController } from "./api/sql-articles/controller";
 import { SqlArticlesService } from "./core/services/sql-articles";
@@ -52,7 +52,7 @@ export const Resources = {
 		JwtAuthGuard,
 		AuthService,
 		PartsRatingService,
-		CustomMiddleware,
+		RequestsLoggerMiddleware,
 		SqlArticlesService,
 	],
 	Imports: [

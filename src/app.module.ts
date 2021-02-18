@@ -5,7 +5,7 @@ import {
 	RequestMethod,
 } from "@nestjs/common";
 import { Resources } from "./resources";
-import { CustomMiddleware } from "./api/middlewares";
+import { RequestsLoggerMiddleware } from "./api/middlewares";
 
 @Module({
 	imports: Resources.Imports,
@@ -15,7 +15,7 @@ import { CustomMiddleware } from "./api/middlewares";
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 		consumer
-			.apply(CustomMiddleware)
+			.apply(RequestsLoggerMiddleware)
 			.forRoutes({ path: "*", method: RequestMethod.ALL });
 	}
 }

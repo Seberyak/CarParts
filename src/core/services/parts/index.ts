@@ -5,11 +5,13 @@ import {
 	IADELETEPart,
 	IAGETManyPart,
 	IAGETPart,
+	IAGETSearchParts,
 	IAPOSTPart,
 	IAPUTPart,
 	IRDELETEPart,
 	IRGETManyPart,
 	IRGETPart,
+	IRGETSearchParts,
 	IRPOSTPart,
 	IRPUTPart,
 } from "../../../../schemas/parts/validators";
@@ -27,6 +29,8 @@ import { IPart } from "../../../../schemas/parts/helper-schemas";
 import { SqlArticlesHelper } from "../sql-articles/helpers";
 import { Connection } from "typeorm";
 import { PartTags } from "./helpers/tags";
+import { SearchPartsHelper } from "./helpers/search";
+import { getManyDocsFunc } from "../../models/typegoose/abstract";
 
 @Injectable()
 export class PartsService {
@@ -63,7 +67,7 @@ export class PartsService {
 			supplier: undefined,
 		};
 
-		if (1 < 2) return dataToSave as IRPOSTPart;
+		// if (1 < 2) return dataToSave as IRPOSTPart;
 
 		const part = new this._PartModel(dataToSave);
 		return part.save();
@@ -103,5 +107,20 @@ export class PartsService {
 		assertUserHasPermission(user, part);
 		await this._PartRatingModel.deleteMany({ partId: args._id });
 		return this._PartModel.deleteOne(args);
+	}
+
+	public async searchParts(
+		args: IAGETSearchParts
+	): Promise<IRGETSearchParts> {
+		const helper = new SearchPartsHelper(args);
+		const query = helper.getQuery();
+		// const partIds = await this._PartModel
+		// 	.find(query)
+		// 	.then(res => res.map(el => el._id));
+		const res = await this._PartModel.find(query);
+		// return query as IRGETSearchParts;
+		console.log(query);
+		// return this.getMany({ _ids: partIds, from: 0, to: 10 });
+		return { docs: res, numDocs: 0 };
 	}
 }
