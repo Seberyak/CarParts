@@ -10,6 +10,7 @@ import {
 	IAGETPartsByProductId,
 	IAGETProductsByNode,
 	ICarModificationsQueryData,
+	IRGETAutocompleteByOem,
 	IRGETCarManufacturers,
 	IRGETCarModels,
 	IRGETCarModifications,
@@ -233,48 +234,20 @@ export class SqlArticlesService {
 
 	public async getAutoCompleteByOem(
 		args: IAGETAutocompleteByOem
-	): Promise<any> {
+	): Promise<IRGETAutocompleteByOem> {
 		const helper = new AutoCompleteByOem(args);
 
-		const nonOriginalsQuery = helper.getNonOriginalsQuery();
-		let res: IProductsTable = await this.manager.query(nonOriginalsQuery);
-		if (!res.length) {
-			const originalsQuery = helper.getOriginalsQuery();
-			res = await this.manager.query(originalsQuery);
-			if (!res.length) assertResourceExist(undefined, "part");
+		const nonOriginalsQuery = helper.getNonOriginalsQuery(args.productId);
+		let productsTable: IProductsTable = await this.manager.query(
+			nonOriginalsQuery
+		);
+		if (!productsTable.length) {
+			const originalsQuery = helper.getOriginalsQuery(args.productId);
+			productsTable = await this.manager.query(originalsQuery);
+			if (!productsTable.length) assertResourceExist(undefined, "part");
 		}
-		const productsTable = res;
 
 		return helper.normalizeTableResponse(productsTable);
-
-		/*
-    const articleLinks: IArticleLinks[] = await this.manager.query(
-      nonOriginalsQuery
-    );
-    if (!articleLinks.length) {
-      assertResourceExist(undefined, "part");
-      isBrand = false;
-      return {
-        isBrand,
-        originalOem: "aq iwereba originali oem",
-        message: "This part is not original",
-      };
-    }
-
-    const modificationIds = articleLinks.map(el => el.linkageid);
-
-    if (1 < 2) {
-      return {
-        modificationId:
-          modificationIds[getRandomInt(modificationIds.length)],
-        len: modificationIds.length,
-      };
-    }
-
-    return await this.Helper.getCarsTreeByModificationIds(
-      modificationIds,
-      args.type
-    );*/
 	}
 
 	// TODO add queries to engine type
@@ -363,9 +336,7 @@ export class SqlArticlesService {
 	): Promise<IRGETProductsByNode> {
 		const { type, modificationId, nodeId } = args;
 
-		const getTable = (
-			type: ECarManufacturerTypes
-		): {
+		const getTable = (): {
 			pds: string;
 			prd: string;
 			modificationColumn: string;
@@ -410,7 +381,7 @@ export class SqlArticlesService {
 			}
 		};
 
-		const { modificationColumn, prd, pds, tree } = getTable(type);
+		const { modificationColumn, prd, pds, tree } = getTable();
 		const query = `select distinct tree.id nodeId, prd.id productId, prd.description 
 		from ${tree} tree
 		join ${pds} pds on pds.nodeid = tree.id and pds.${modificationColumn} = tree.${modificationColumn}

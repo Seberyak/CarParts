@@ -30,6 +30,12 @@ import { SqlArticlesController } from "./api/sql-articles/controller";
 import { SqlArticlesService } from "./core/services/sql-articles";
 require("dotenv").config();
 
+console.log("=========================");
+console.log(
+	process.env.MYSQL_PORT,
+	process.env.MYSQL_PASSWORD,
+	process.env.MYSQL_USER
+);
 export const Resources = {
 	Controllers: [
 		AppController,
@@ -57,15 +63,20 @@ export const Resources = {
 	],
 	Imports: [
 		// ConfigModule.forRoot(),
-		TypegooseModule.forRoot("mongodb://localhost:27017/nest", {
-			useNewUrlParser: true,
-		}),
+		TypegooseModule.forRoot(
+			`mongodb://localhost:${process.env.MONGODB_PORT ?? 27017}/nest`,
+			{
+				useNewUrlParser: true,
+			}
+		),
 		// MulterModule.register({ dest: "./uploads" }),
 		TypegooseModule.forFeature([User, File, Part, PartRating]),
 		MulterModule.registerAsync({
 			useClass: GridFsMulterConfigService,
 		}),
-		MongooseModule.forRoot("mongodb://localhost:27017/nest"),
+		MongooseModule.forRoot(
+			`mongodb://localhost:${process.env.MONGODB_PORT ?? 27017}/nest`
+		),
 		JwtModule.register({
 			secret: jwtConstants.secret,
 			signOptions: { expiresIn: "2days" },
@@ -73,7 +84,7 @@ export const Resources = {
 		TypeOrmModule.forRoot({
 			type: "mysql",
 			host: "localhost",
-			port: 3306, //toInt(process.env.MYSQL_PORT) || 3306,
+			port: toInt(process.env.MYSQL_PORT),
 			username: process.env.MYSQL_USER || "root",
 			password: process.env.MYSQL_PASSWORD || "password",
 			database: process.env.MYSQL_DATABASE || "dt2019q2",
@@ -85,8 +96,6 @@ export const Resources = {
 };
 
 function toInt(args: string): number {
-	console.log("==================================");
-	console.log(args);
 	let res = -1;
 	try {
 		res = parseInt(args);

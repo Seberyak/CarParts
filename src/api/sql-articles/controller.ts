@@ -23,6 +23,7 @@ import {
 	IRGETProductsByNode,
 	AGETPartsByProductIdSchema,
 	IRGETPartsByProductId,
+	IRGETAutocompleteByOem,
 } from "../../../schemas/sql-articles/validators";
 
 const controller = "api/sql-articles";
@@ -69,7 +70,7 @@ export class SqlArticlesController {
 	async getAutoCompleteByOem(
 		@wValidatedArg(AGETAutocompleteByOemSchema)
 		args: IAGETAutocompleteByOem
-	): Promise<any> {
+	): Promise<IRGETAutocompleteByOem> {
 		return this._SqlArticlesService.getAutoCompleteByOem(args);
 	}
 
