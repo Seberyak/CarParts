@@ -24,6 +24,9 @@ import {
 	AGETPartsByProductIdSchema,
 	IRGETPartsByProductId,
 	IRGETAutocompleteByOem,
+	IRGETCarTreesByModificationIds,
+	IAGETCarTreesByModificationIds,
+	AGETCarTreesByModificationIdsSchema,
 } from "../../../schemas/sql-articles/validators";
 
 const controller = "api/sql-articles";
@@ -79,5 +82,13 @@ export class SqlArticlesController {
 		@wValidatedArg(AGETProductsByNodeSchema) args: IAGETProductsByNode
 	): Promise<IRGETProductsByNode> {
 		return this._SqlArticlesService.getProductsByNode(args);
+	}
+
+	@Get(`${controller}/car-trees-by-modificationIds`)
+	async getCarTreesBtModificationIds(
+		@wValidatedArg(AGETCarTreesByModificationIdsSchema)
+		args: IAGETCarTreesByModificationIds
+	): Promise<IRGETCarTreesByModificationIds> {
+		return this._SqlArticlesService.getCarTreesBtModificationIds(args);
 	}
 }

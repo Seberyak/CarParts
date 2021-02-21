@@ -40,25 +40,22 @@ export class PartTags {
 
 		this.tags.push(...this.parseCarsCategoriesTree(carsCategoriesTree));
 
-		//TODO when productId will be required property, remove this if and raise up it's body
-		if (!!productId) {
-			const nodeIds = await this.getNodesByProductId({
-				carManufacturerType: manufacturerType,
-				productId,
-				modificationIds,
-			});
+		const nodeIds = await this.getNodesByProductId({
+			carManufacturerType: manufacturerType,
+			productId,
+			modificationIds,
+		});
 
-			const promises: PromiseLike<any>[] = nodeIds.map(nodeId =>
-				this._SqlArticlesHelper.getCategoriesTreeByNodeId({
-					modificationIds,
-					nodeId,
-					type: manufacturerType,
-				})
-			);
-			const partsCategoriesTrees = await Promise.all(promises);
-			const categories = this.parsePartCategories(partsCategoriesTrees);
-			this.tags.push(...categories, ...parseWordsFromString(categories));
-		}
+		const promises: PromiseLike<any>[] = nodeIds.map(nodeId =>
+			this._SqlArticlesHelper.getCategoriesTreeByNodeId({
+				modificationIds,
+				nodeId,
+				type: manufacturerType,
+			})
+		);
+		const partsCategoriesTrees = await Promise.all(promises);
+		const categories = this.parsePartCategories(partsCategoriesTrees);
+		this.tags.push(...categories, ...parseWordsFromString(categories));
 
 		return [...new Set(this.tags)];
 	}

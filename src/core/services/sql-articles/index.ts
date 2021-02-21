@@ -6,6 +6,7 @@ import {
 	IAGETCarManufacturers,
 	IAGETCarModels,
 	IAGETCarModifications,
+	IAGETCarTreesByModificationIds,
 	IAGETPartCategories,
 	IAGETPartsByProductId,
 	IAGETProductsByNode,
@@ -14,6 +15,7 @@ import {
 	IRGETCarManufacturers,
 	IRGETCarModels,
 	IRGETCarModifications,
+	IRGETCarTreesByModificationIds,
 	IRGETPartCategories,
 	IRGETPartsByProductId,
 	IRGETProductsByNode,
@@ -236,7 +238,6 @@ export class SqlArticlesService {
 		args: IAGETAutocompleteByOem
 	): Promise<IRGETAutocompleteByOem> {
 		const helper = new AutoCompleteByOem(args);
-
 		const nonOriginalsQuery = helper.getNonOriginalsQuery(args.productId);
 		let productsTable: IProductsTable = await this.manager.query(
 			nonOriginalsQuery
@@ -390,5 +391,13 @@ export class SqlArticlesService {
 		and tree.id = ${nodeId}`;
 
 		return this.manager.query(query);
+	}
+
+	public async getCarTreesBtModificationIds(
+		args: IAGETCarTreesByModificationIds
+	): Promise<IRGETCarTreesByModificationIds> {
+		const { modificationIds, type } = args;
+		const helper = new SqlArticlesHelper(this.manager);
+		return helper.getCarsTreeByModificationIds(modificationIds, type);
 	}
 }

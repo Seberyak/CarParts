@@ -245,3 +245,22 @@ export type IRGETProductsByNode = {
 	productId: number;
 	description: string;
 }[];
+
+///---------------GET Car Trees By ModificationIds
+
+export const AGETCarTreesByModificationIdsSchema = Joi.object({
+	modificationIds: Joi.array()
+		.items(Joi.number())
+		.min(1)
+		.required(),
+	type: CarManufacturersTypesSchema.required(),
+});
+
+export interface IAGETCarTreesByModificationIds {
+	modificationIds: number[];
+	type: ECarManufacturerTypes;
+}
+
+export const RGETCarTreesByModificationIdsSchema = Joi.array();
+
+export type IRGETCarTreesByModificationIds = any;
