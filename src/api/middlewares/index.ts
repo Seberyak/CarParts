@@ -7,7 +7,7 @@ export class RequestsLoggerMiddleware implements NestMiddleware {
 	constructor() {}
 
 	async use(req: Request, res: Response, next: NextFunction) {
-		if (process.env.MODE !== "development") next();
+		// if (process.env.MODE !== "development") next();
 		const n = 40;
 		console.log(`${"=".repeat(n)} New Request Detected ${"=".repeat(n)}`);
 		console.log("URL :", req.originalUrl);
