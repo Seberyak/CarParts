@@ -4,16 +4,14 @@ import { ErrorFilter } from "./api/error-filter";
 import { NgrokService } from "./core/services/ngrok";
 require("dotenv").config();
 import * as fs from "fs";
-import path from "path";
+import { join } from "path";
 
 async function bootstrap() {
 	const apiPort = parseInt(process.env.API_PORT) || 3000;
-
+	const path = join(__dirname, "../../", "/secrets");
 	const httpsOptions = {
-		key: fs.readFileSync("./secrets/private-key.pem"),
-		cert: fs.readFileSync(
-			"./home/valera/Documents/CarParts/secrets/public-certificate.pem"
-		),
+		key: fs.readFileSync(join(path, "key.pem")),
+		cert: fs.readFileSync(join(path, "public-certificate.pem")),
 	};
 	const app = await NestFactory.create(AppModule, { httpsOptions });
 	app.useGlobalFilters(new ErrorFilter());
