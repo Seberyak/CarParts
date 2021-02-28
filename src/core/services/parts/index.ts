@@ -114,13 +114,9 @@ export class PartsService {
 	): Promise<IRGETSearchParts> {
 		const helper = new SearchPartsHelper(args);
 		const query = helper.getQuery();
-		// const partIds = await this._PartModel
-		// 	.find(query)
-		// 	.then(res => res.map(el => el._id));
+
 		const res = await this._PartModel.find(query);
-		// return query as IRGETSearchParts;
-		console.log(query);
-		// return this.getMany({ _ids: partIds, from: 0, to: 10 });
-		return { docs: res, numDocs: 0 };
+		const numDocs = await this._PartModel.find(query).countDocuments();
+		return { docs: res, numDocs };
 	}
 }
