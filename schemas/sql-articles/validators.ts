@@ -5,6 +5,10 @@ import {
 	ELinkageTypes,
 } from "./helper-schemas";
 
+const antiInjection = new RegExp(
+	`^(?:(?!\\b(DELETE)\\b|\\b(delete)\\b|\\b(DROP)\\b|\\b(drop)\\b|\\b(TABLE)\\b|\\b(table)\\b|;|'|").)*$`
+);
+
 ///---------------GET Car Manufacturers
 
 export const AGETCarManufacturersSchema = Joi.object({
@@ -30,7 +34,9 @@ export interface IRGETCarManufacturers {
 export const AGETCarModelsSchema = Joi.object({
 	manufacturerId: Joi.number().required(),
 	type: CarManufacturersTypesSchema.required(),
-	pattern: Joi.string(),
+	pattern: Joi.string()
+		.regex(antiInjection)
+		.message("Invalid symbols detected!"),
 	productionYear: Joi.number(),
 });
 
@@ -68,13 +74,13 @@ export interface ICarModificationsQueryData {
 
 export const AGETCarModificationsSchema = Joi.object({
 	modelId: Joi.number().required(),
-	type: Joi.string().required(),
+	type: CarManufacturersTypesSchema.required(),
 	productionYear: Joi.number(),
 });
 
 export interface IAGETCarModifications {
 	modelId: number;
-	type: string;
+	type: ECarManufacturerTypes;
 	productionYear: number;
 }
 
@@ -184,7 +190,10 @@ export type ICarsTreeModificationLevel = string;
 export type IRCarsTree = Record<string, ICarsTreeManufacturerLevel>;
 
 export const AGETAutocompleteByOemSchema = Joi.object({
-	oem: Joi.string().required(),
+	oem: Joi.string()
+		.regex(antiInjection)
+		.message("Invalid symbols detected!")
+		.required(),
 	type: CarManufacturersTypesSchema.required(),
 	productId: Joi.number(),
 });
