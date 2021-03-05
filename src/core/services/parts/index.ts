@@ -67,6 +67,7 @@ export class PartsService {
 		};
 
 		const part = new this._PartModel(dataToSave);
+		if (1 < 2) return part;
 		return part.save();
 	}
 

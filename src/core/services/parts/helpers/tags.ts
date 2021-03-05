@@ -32,19 +32,21 @@ export class PartTags {
 
 	public async get(): Promise<string[]> {
 		const { modificationIds, manufacturerType, productId } = this.args;
-
-		const carsCategoriesTree = await this._SqlArticlesHelper.getCarsTreeByModificationIds(
-			modificationIds,
-			manufacturerType
-		);
-
-		this.tags.push(...this.parseCarsCategoriesTree(carsCategoriesTree));
-
-		const nodeIds = await this.getNodesByProductId({
-			carManufacturerType: manufacturerType,
-			productId,
-			modificationIds,
-		});
+		console.time();
+		const [carsFullNames, nodeIds] = await Promise.all([
+			this._SqlArticlesHelper.getCarFullNamesByModificationIds(
+				modificationIds,
+				manufacturerType
+			),
+			this.getNodesByProductId({
+				carManufacturerType: manufacturerType,
+				productId,
+				modificationIds,
+			}),
+		]);
+		console.log("Here1");
+		console.timeLog();
+		this.tags.push(...carsFullNames);
 
 		const promises: PromiseLike<any>[] = nodeIds.map(nodeId =>
 			this._SqlArticlesHelper.getCategoriesTreeByNodeId({
@@ -53,10 +55,13 @@ export class PartTags {
 				type: manufacturerType,
 			})
 		);
-		const partsCategoriesTrees = await Promise.all(promises);
-		const categories = this.parsePartCategories(partsCategoriesTrees);
+		const partCategoriesTrees = await Promise.all(promises);
+		console.log("got partCategoriesTree");
+		console.timeLog();
+		const categories = this.parsePartCategories(partCategoriesTrees);
 		this.tags.push(...categories, ...parseWordsFromString(categories));
-
+		console.log("parsed partCategoriesTree");
+		console.timeEnd();
 		return [...new Set(this.tags)];
 	}
 
@@ -108,7 +113,6 @@ export class PartTags {
 
 	private parseCarsCategoriesTree(data: IRCarsTree): string[] {
 		const wordsSet = new Set<string>();
-
 		for (const manufacturerKey in data) {
 			const manufacturerObj = data[manufacturerKey];
 			if (!manufacturerObj) break;

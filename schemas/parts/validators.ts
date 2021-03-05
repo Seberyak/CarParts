@@ -13,7 +13,6 @@ import {
 	UpdateStripKeysSchema,
 } from "../helper-schemas";
 import { CarManufacturersTypesSchema } from "../sql-articles/helper-schemas";
-import { ObjectId } from "bson";
 
 ///---------------POST part
 
