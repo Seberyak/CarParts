@@ -32,7 +32,7 @@ export class PartTags {
 
 	public async get(): Promise<string[]> {
 		const { modificationIds, manufacturerType, productId } = this.args;
-		console.time();
+
 		const [carsFullNames, nodeIds] = await Promise.all([
 			this._SqlArticlesHelper.getCarFullNamesByModificationIds(
 				modificationIds,
@@ -44,8 +44,7 @@ export class PartTags {
 				modificationIds,
 			}),
 		]);
-		console.log("Here1");
-		console.timeLog();
+
 		this.tags.push(...carsFullNames);
 
 		const promises: PromiseLike<any>[] = nodeIds.map(nodeId =>
@@ -56,12 +55,10 @@ export class PartTags {
 			})
 		);
 		const partCategoriesTrees = await Promise.all(promises);
-		console.log("got partCategoriesTree");
-		console.timeLog();
+
 		const categories = this.parsePartCategories(partCategoriesTrees);
 		this.tags.push(...categories, ...parseWordsFromString(categories));
-		console.log("parsed partCategoriesTree");
-		console.timeEnd();
+
 		return [...new Set(this.tags)];
 	}
 

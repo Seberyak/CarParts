@@ -28,6 +28,8 @@ import { RequestsLoggerMiddleware } from "./api/middlewares";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SqlArticlesController } from "./api/sql-articles/controller";
 import { SqlArticlesService } from "./core/services/sql-articles";
+import { MigrationsService } from "./core/services/migrations";
+import { MigrationsController } from "./api/migrations/controller";
 require("dotenv").config();
 
 export const Resources = {
@@ -39,6 +41,7 @@ export const Resources = {
 		AuthController,
 		PartsRatingController,
 		SqlArticlesController,
+		MigrationsController,
 	],
 
 	Providers: [
@@ -54,6 +57,7 @@ export const Resources = {
 		PartsRatingService,
 		RequestsLoggerMiddleware,
 		SqlArticlesService,
+		MigrationsService,
 	],
 	Imports: [
 		// ConfigModule.forRoot(),
