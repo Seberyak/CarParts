@@ -47,6 +47,36 @@ export class SqlArticlesHelper {
 		return this.createCarsTreeByQueryData(data);
 	}
 
+	public async getCarFullNamesByModificationIds(
+		ids: number[],
+		type: ECarManufacturerTypes
+	): Promise<string[]> {
+		let table: string;
+		switch (type) {
+			case ECarManufacturerTypes.passenger:
+				table = "passanger_cars";
+				break;
+			case ECarManufacturerTypes.commercial:
+				table = "commercial_vehicles";
+				break;
+			case ECarManufacturerTypes.motorbike:
+				table = "commercial_vehicles";
+				break;
+			case ECarManufacturerTypes.axle:
+				table = "axles";
+				break;
+			case ECarManufacturerTypes.engine:
+				assertResourceExist(undefined, "part");
+				break;
+		}
+		const query = `select distinct concat_ws(' : ', mdf.fulldescription,mdf.constructioninterval)
+		 as name from ${table} mdf join models m on mdf.modelid=m.id join manufacturers
+		 mfct on m.manufacturerid=mfct.id where mdf.id in ${arrayToSqlQueryList(ids)}`;
+
+		const res: { name: string }[] = await this.manager.query(query);
+		return res.map(el => el.name);
+	}
+
 	public createCarsTreeByQueryData(args: ICarsTreeRawData): IRCarsTree {
 		const res: IRCarsTree = {};
 		const manufacturersSet = new Set<number>();
