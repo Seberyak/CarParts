@@ -30,7 +30,6 @@ import { SqlArticlesHelper } from "../sql-articles/helpers";
 import { Connection } from "typeorm";
 import { PartTags } from "./helpers/tags";
 import { SearchPartsHelper } from "./helpers/search";
-import { getManyDocsFunc } from "../../models/typegoose/abstract";
 
 @Injectable()
 export class PartsService {
@@ -67,8 +66,6 @@ export class PartsService {
 			supplier: undefined,
 		};
 
-		// if (1 < 2) return dataToSave as IRPOSTPart;
-
 		const part = new this._PartModel(dataToSave);
 		return part.save();
 	}
@@ -90,6 +87,18 @@ export class PartsService {
 			.then(doc => docToObj(doc));
 		assertResourceExist(part, "part");
 		assertUserHasPermission(user, part);
+		part.title = args.title;
+		part.tags = await new PartTags(args, this._Connection).get();
+		part.barCode = args.barCode;
+		part.description = args.description;
+		part.images = args.images;
+		part.manufacturerType = args.manufacturerType;
+		part.modificationIds = args.modificationIds;
+		part.oem = args.oem;
+		part.price = args.price;
+		part.quantity = args.quantity;
+		part.productId = args.productId;
+		part.supplier = args.supplier ?? undefined;
 
 		return this._PartModel
 			.updateOne(_id, updateData)

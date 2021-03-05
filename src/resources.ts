@@ -30,12 +30,6 @@ import { SqlArticlesController } from "./api/sql-articles/controller";
 import { SqlArticlesService } from "./core/services/sql-articles";
 require("dotenv").config();
 
-console.log("=========================");
-console.log(
-	process.env.MYSQL_PORT,
-	process.env.MYSQL_PASSWORD,
-	process.env.MYSQL_USER
-);
 export const Resources = {
 	Controllers: [
 		AppController,
@@ -64,7 +58,8 @@ export const Resources = {
 	Imports: [
 		// ConfigModule.forRoot(),
 		TypegooseModule.forRoot(
-			`mongodb://localhost:${process.env.MONGODB_PORT ?? 27017}/nest`,
+			`mongodb://${process.env.SERVER_IP ?? "localhost"}:${process.env
+				.MONGODB_PORT ?? 27017}/nest`,
 			{
 				useNewUrlParser: true,
 			}
@@ -75,7 +70,8 @@ export const Resources = {
 			useClass: GridFsMulterConfigService,
 		}),
 		MongooseModule.forRoot(
-			`mongodb://localhost:${process.env.MONGODB_PORT ?? 27017}/nest`
+			`mongodb://${process.env.SERVER_IP ?? "localhost"}:${process.env
+				.MONGODB_PORT ?? 27017}/nest`
 		),
 		JwtModule.register({
 			secret: jwtConstants.secret,
@@ -83,7 +79,7 @@ export const Resources = {
 		}),
 		TypeOrmModule.forRoot({
 			type: "mysql",
-			host: "localhost",
+			host: process.env.SERVER_IP || "localhost",
 			port: toInt(process.env.MYSQL_PORT),
 			username: process.env.MYSQL_USER || "root",
 			password: process.env.MYSQL_PASSWORD || "password",
