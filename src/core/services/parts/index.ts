@@ -30,6 +30,7 @@ import { SqlArticlesHelper } from "../sql-articles/helpers";
 import { Connection } from "typeorm";
 import { PartTags } from "./helpers/tags";
 import { SearchPartsHelper } from "./helpers/search";
+import { getManyDocsFunc } from "../../models/typegoose/abstract";
 
 @Injectable()
 export class PartsService {
@@ -124,8 +125,6 @@ export class PartsService {
 		const helper = new SearchPartsHelper(args);
 		const query = helper.getQuery();
 
-		const res = await this._PartModel.find(query);
-		const numDocs = await this._PartModel.find(query).countDocuments();
-		return { docs: res, numDocs };
+		return getManyDocsFunc(args, this._PartModel, query);
 	}
 }

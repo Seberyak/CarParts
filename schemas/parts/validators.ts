@@ -82,6 +82,7 @@ export type IRDELETEPart = unknown;
 ///---------------GET Search part
 
 export const AGETSearchPartsSchema = Joi.object({
+	...APaginatedSchema,
 	manufacturerType: CarManufacturersTypesSchema,
 	modificationIds: Joi.array().items(Joi.number()),
 	productId: Joi.number(),
@@ -97,7 +98,7 @@ export const AGETSearchPartsSchema = Joi.object({
 	searchableText: Joi.string(),
 });
 
-export interface IAGETSearchParts {
+export interface IAGETSearchParts extends IAPaginated {
 	manufacturerType?: IPart["manufacturerType"];
 	modificationIds?: IPart["modificationIds"];
 	productId?: IPart["productId"];

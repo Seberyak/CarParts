@@ -9,10 +9,10 @@ export abstract class AbstractModel {
 
 export async function getManyDocsFunc<T>(
 	args: IAPaginated,
-	model: Model<any>
+	model: Model<any>,
+	query = {}
 ): Promise<IRPaginated<T>> {
 	const { _ids } = args;
-	let query = {};
 	if (!!args._ids && args._ids.length > 0) {
 		query = { _id: { $in: _ids } };
 	}
