@@ -31,6 +31,7 @@ import { Connection } from "typeorm";
 import { PartTags } from "./helpers/tags";
 import { SearchPartsHelper } from "./helpers/search";
 import { getManyDocsFunc } from "../../models/typegoose/abstract";
+import { IPartCartModel, PartCart } from "../../models/typegoose/part-cart";
 
 @Injectable()
 export class PartsService {
@@ -42,6 +43,10 @@ export class PartsService {
 
 		@InjectModel(PartRating)
 		private readonly _PartRatingModel: IPartRatingModel,
+
+		@InjectModel(PartCart)
+		private readonly _PartCartModel: IPartCartModel,
+
 		private readonly _Connection: Connection
 	) {
 		this.manager = this._Connection.manager;
@@ -117,7 +122,11 @@ export class PartsService {
 			.then(doc => docToObj(doc));
 		assertResourceExist(part, "part");
 		assertUserHasPermission(user, part);
-		await this._PartRatingModel.deleteMany({ partId: args._id });
+		//delete all dependencies
+		await Promise.all([
+			this._PartCartModel.deleteMany({ partId: args._id }),
+			this._PartRatingModel.deleteMany({ partId: args._id }),
+		]);
 		return this._PartModel.deleteOne(args);
 	}
 

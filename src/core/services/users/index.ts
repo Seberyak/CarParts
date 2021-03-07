@@ -20,12 +20,27 @@ import { docToObj } from "../../utils/db-config";
 import { sha512 } from "js-sha512";
 import { IAPOSTUser, IRPOSTUser } from "../../../../schemas/auth/validators";
 import { UserTypes } from "../../../../schemas/user/user-types";
+import { IPartModel, Part } from "../../models/typegoose/parts";
+import {
+	IPartRatingModel,
+	PartRating,
+} from "../../models/typegoose/parts-rating";
+import { IPartCartModel, PartCart } from "../../models/typegoose/part-cart";
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectModel(User)
-		private readonly _UserModel: IUserModel
+		private readonly _UserModel: IUserModel,
+
+		@InjectModel(Part)
+		private readonly _PartModel: IPartModel,
+
+		@InjectModel(PartRating)
+		private readonly _PartRatingModel: IPartRatingModel,
+
+		@InjectModel(PartCart)
+		private readonly _PartCartModel: IPartCartModel
 	) {}
 
 	public async create(args: IAPOSTUser): Promise<IRPOSTUser> {
@@ -61,6 +76,13 @@ export class UsersService {
 	}
 
 	public async delete(args: IADELETEUser): Promise<IRDELETEUser> {
+		const userId = args._id;
+		//delete all dependencies
+		await Promise.all([
+			this._PartModel.deleteMany({ author: userId }),
+			this._PartCartModel.deleteMany({ author: userId }),
+			this._PartRatingModel.deleteMany({ author: userId }),
+		]);
 		return this._UserModel.deleteOne(args);
 	}
 }
