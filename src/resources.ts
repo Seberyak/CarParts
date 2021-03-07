@@ -30,6 +30,9 @@ import { SqlArticlesController } from "./api/sql-articles/controller";
 import { SqlArticlesService } from "./core/services/sql-articles";
 import { MigrationsService } from "./core/services/migrations";
 import { MigrationsController } from "./api/migrations/controller";
+import { PartsCartService } from "./core/services/parts-cart";
+import { PartsCartController } from "./api/parts-cart/contorller";
+import { PartCart } from "./core/models/typegoose/part-cart";
 require("dotenv").config();
 
 export const Resources = {
@@ -42,6 +45,7 @@ export const Resources = {
 		PartsRatingController,
 		SqlArticlesController,
 		MigrationsController,
+		PartsCartController,
 	],
 
 	Providers: [
@@ -58,6 +62,7 @@ export const Resources = {
 		RequestsLoggerMiddleware,
 		SqlArticlesService,
 		MigrationsService,
+		PartsCartService,
 	],
 	Imports: [
 		// ConfigModule.forRoot(),
@@ -69,7 +74,7 @@ export const Resources = {
 			}
 		),
 		// MulterModule.register({ dest: "./uploads" }),
-		TypegooseModule.forFeature([User, File, Part, PartRating]),
+		TypegooseModule.forFeature([User, File, Part, PartRating, PartCart]),
 		MulterModule.registerAsync({
 			useClass: GridFsMulterConfigService,
 		}),

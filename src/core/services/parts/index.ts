@@ -68,7 +68,9 @@ export class PartsService {
 		};
 
 		const part = new this._PartModel(dataToSave);
-		return part.save();
+		const a = await part.save();
+		console.log();
+		return a;
 	}
 
 	public async get(args: IAGETPart): Promise<IRGETPart> {

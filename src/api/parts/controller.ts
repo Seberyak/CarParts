@@ -25,7 +25,6 @@ import { ObjectIdPattern } from "../../core/utils/common";
 import { IUser } from "../../../schemas/user/helper-schemas";
 import { InjectModel } from "nestjs-typegoose";
 import { IUserModel, User } from "../../core/models/typegoose/users";
-import { Request } from "express";
 import {
 	Delete,
 	Get,
