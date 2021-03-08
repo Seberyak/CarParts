@@ -80,7 +80,7 @@ export class PartsController {
 		return this._PartsService.delete(args, user);
 	}
 
-	@Get(`${controller}/search-parts`)
+	@Post(`${controller}/search-parts`)
 	async searchParts(
 		@wValidatedArg(AGETSearchPartsSchema) args: IAGETSearchParts
 	): Promise<IRGETSearchParts> {
