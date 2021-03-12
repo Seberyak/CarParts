@@ -21,3 +21,16 @@ export const editFileName = (req, file, callback) => {
 		.join("");
 	callback(null, `${name}${randomName}${fileExtName}`);
 };
+
+export const excelFileFilter = (req, file, callback) => {
+	if (!file.originalname.match(/\.(xlx|xlsx|csv)$/)) {
+		return callback(
+			new MError(
+				HttpStatus.BAD_REQUEST,
+				"Only excel files format are allowed!"
+			),
+			false
+		);
+	}
+	callback(null, true);
+};

@@ -33,6 +33,9 @@ import { MigrationsController } from "./api/migrations/controller";
 import { PartsCartService } from "./core/services/parts-cart";
 import { PartsCartController } from "./api/parts-cart/contorller";
 import { PartCart } from "./core/models/typegoose/part-cart";
+import { ExcelParserController } from "./api/excel-parser/controller";
+import { ExcelParserService } from "./core/services/excel-parser";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require("dotenv").config();
 
 export const Resources = {
@@ -46,6 +49,7 @@ export const Resources = {
 		SqlArticlesController,
 		MigrationsController,
 		PartsCartController,
+		ExcelParserController,
 	],
 
 	Providers: [
@@ -63,11 +67,12 @@ export const Resources = {
 		SqlArticlesService,
 		MigrationsService,
 		PartsCartService,
+		ExcelParserService,
 	],
 	Imports: [
 		// ConfigModule.forRoot(),
 		TypegooseModule.forRoot(
-			`mongodb://${process.env.SERVER_IP ?? "localhost"}:${process.env
+			`mongodb://${process.env.MONGO_IP ?? "localhost"}:${process.env
 				.MONGODB_PORT ?? 27017}/nest`,
 			{
 				useNewUrlParser: true,
@@ -79,7 +84,7 @@ export const Resources = {
 			useClass: GridFsMulterConfigService,
 		}),
 		MongooseModule.forRoot(
-			`mongodb://${process.env.SERVER_IP ?? "localhost"}:${process.env
+			`mongodb://${process.env.MONGO_IP ?? "localhost"}:${process.env
 				.MONGODB_PORT ?? 27017}/nest`
 		),
 		JwtModule.register({

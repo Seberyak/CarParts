@@ -1,9 +1,10 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ErrorFilter } from "./api/error-filter";
-require("dotenv").config();
 import * as fs from "fs";
 import { join } from "path";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require("dotenv").config();
 
 async function bootstrap() {
 	const apiPort = parseInt(process.env.API_PORT) || 3000;
@@ -14,8 +15,8 @@ async function bootstrap() {
 	};
 	const app = await NestFactory.create(AppModule, { httpsOptions });
 	app.useGlobalFilters(new ErrorFilter());
-	await app.listen(apiPort);
 	app.enableCors();
+	await app.listen(apiPort);
 	await console.log(
 		`=======================Api started=======================`
 	);

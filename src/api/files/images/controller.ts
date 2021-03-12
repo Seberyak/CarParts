@@ -8,10 +8,7 @@ import {
 } from "@nestjs/common";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
-import {
-	editFileName,
-	imageFileFilter,
-} from "../../../core/utils/image-upload";
+import { editFileName, imageFileFilter } from "../../../core/utils/uploads";
 import * as fs from "fs";
 import { join } from "path";
 import {
