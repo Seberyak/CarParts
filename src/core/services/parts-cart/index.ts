@@ -62,7 +62,7 @@ export class PartsCartService {
 		};
 
 		const partCart = new this._PartCartModel(dataToSave);
-		return partCart.save();
+		return partCart.save().then(docToObj);
 	}
 
 	public async deletePartFromCart(

@@ -48,7 +48,7 @@ export class UsersService {
 
 		const user = new this._UserModel(args);
 		user.password = sha512(user.password);
-		return user.save();
+		return user.save().then(docToObj);
 	}
 
 	public async get(args: IAGETUser): Promise<IRGETUser> {

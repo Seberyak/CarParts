@@ -87,7 +87,7 @@
         "destructuring": "all"
       }
     ],
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
     "max-lines": [
       "error",
       350

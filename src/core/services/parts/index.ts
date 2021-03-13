@@ -73,15 +73,13 @@ export class PartsService {
 		};
 
 		const part = new this._PartModel(dataToSave);
-		const a = await part.save();
-		console.log();
-		return a;
+		return part.save().then(docToObj);
 	}
 
 	public async get(args: IAGETPart): Promise<IRGETPart> {
 		const part = await this._PartModel.findOne(args);
 		assertResourceExist(part, "part");
-		return part;
+		return docToObj(part);
 	}
 
 	public async getMany(args: IAGETManyPart): Promise<IRGETManyPart> {
