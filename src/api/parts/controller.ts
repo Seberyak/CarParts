@@ -1,4 +1,4 @@
-import { Controller } from "@nestjs/common";
+import { Controller, UseGuards } from "@nestjs/common";
 import { PartsService } from "../../core/services/parts";
 import { wUser, wValidatedArg } from "../../core/utils/decorators/validation";
 import {
@@ -31,6 +31,8 @@ import {
 	Post,
 	Put,
 } from "../../core/utils/decorators/custom-requests/request-mapping";
+import { IsAdmin } from "../../core/utils/guards";
+import { IPartModel, Part } from "../../core/models/typegoose/parts";
 
 const controller = "api/parts";
 
@@ -39,7 +41,10 @@ export class PartsController {
 	constructor(
 		private readonly _PartsService: PartsService,
 		@InjectModel(User)
-		private readonly _UserModel: IUserModel
+		private readonly _UserModel: IUserModel,
+
+		@InjectModel(Part)
+		private readonly _PartModel: IPartModel
 	) {}
 
 	@Post(`${controller}/`)
@@ -85,5 +90,16 @@ export class PartsController {
 		@wValidatedArg(AGETSearchPartsSchema) args: IAGETSearchParts
 	): Promise<IRGETSearchParts> {
 		return this._PartsService.searchParts(args);
+	}
+
+	// admin endpoint for delete parts
+	@UseGuards(IsAdmin)
+	@Delete(`${controller}/delete-last-parts`)
+	async deleteLastParts(): Promise<any> {
+		const lastDate = new Date(1615632110020);
+
+		return this._PartModel.deleteMany({
+			createdAt: { $gt: lastDate },
+		});
 	}
 }
