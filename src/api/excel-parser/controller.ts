@@ -19,6 +19,8 @@ export class ExcelParserController {
 	// eslint-disable-next-line no-unused-vars
 	constructor(private readonly _ExcelParserService: ExcelParserService) {}
 
+	//TODO add userId for parts author property
+
 	@Post(controller)
 	@UseInterceptors(
 		FileInterceptor("file", {
@@ -36,7 +38,7 @@ export class ExcelParserController {
 		@wValidatedArg(APOPSTExcelParserSchema) args: IAPOPSTExcelParser
 	): Promise<any> {
 		return this._ExcelParserService.main({
-			type: args.type,
+			carManufacturerType: args.type,
 			fileName: file.filename,
 		});
 	}
